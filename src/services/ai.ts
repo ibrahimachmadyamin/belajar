@@ -46,6 +46,42 @@ export const processMaterial = async (rawText: string) => {
   }
 };
 
+// Fungsi untuk mengekstrak dan merangkum dokumen (PDF/Word)
+export const processDocument = async (base64Data: string, mimeType: string) => {
+  const genAI = await getGenAI();
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
+
+  const prompt = `
+  Anda adalah asisten cerdas. Saya melampirkan sebuah dokumen.
+  Tugas Anda adalah memindai seluruh isinya, memahaminya, lalu:
+  1. Buatlah rangkuman yang sangat komprehensif namun padat dari dokumen ini.
+  2. Ekstrak informasi dan poin-poin penting agar mudah dipelajari.
+  3. Berikan judul yang sesuai.
+  4. Tentukan topik atau kategorinya.
+  
+  Kembalikan hasil HANYA dalam format JSON yang valid seperti ini tanpa markdown backticks:
+  {
+    "title": "Judul Dokumen",
+    "topic": "Topik Dokumen",
+    "content": "Rangkuman lengkap dan rapi dari isi dokumen"
+  }
+  `;
+
+  const result = await model.generateContent([
+    prompt,
+    { inlineData: { data: base64Data, mimeType } }
+  ]);
+  const response = result.response.text();
+  
+  try {
+    const cleanedText = response.replace(/```json\n?|```/g, '').trim();
+    return JSON.parse(cleanedText);
+  } catch (error) {
+    console.error("Gagal parsing JSON dari AI Dokumen", error);
+    throw new Error('AI mengembalikan format yang tidak valid dari dokumen.');
+  }
+};
+
 // Fungsi untuk generate kuis
 export const generateQuiz = async (materialContent: string) => {
   const genAI = await getGenAI();

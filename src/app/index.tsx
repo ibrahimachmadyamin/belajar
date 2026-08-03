@@ -2,21 +2,46 @@ import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { processMaterial, generateQuiz } from '../services/ai';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
+import { processMaterial, generateQuiz, processDocument } from '../services/ai';
 import { db, collection, addDoc } from '../config/firebase'; 
 
 export default function Home() {
   const router = useRouter();
   const [text, setText] = useState('');
+  const [attachedFile, setAttachedFile] = useState<DocumentPicker.DocumentPickerAsset | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleAttach = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'],
+      });
+      if (!result.canceled && result.assets.length > 0) {
+        setAttachedFile(result.assets[0]);
+      }
+    } catch (error) {
+      console.log('Error picking document', error);
+    }
+  };
+
   const handleSend = async () => {
-    if (!text.trim()) return;
+    if (!text.trim() && !attachedFile) return;
     
     setIsLoading(true);
     try {
-      // 1. Kirim ke AI untuk merapikan materi
-      const processed = await processMaterial(text);
+      let processed: any = null;
+      
+      if (attachedFile) {
+        // Baca file menjadi Base64
+        const base64Data = await FileSystem.readAsStringAsync(attachedFile.uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        processed = await processDocument(base64Data, attachedFile.mimeType || 'application/pdf');
+      } else {
+        processed = await processMaterial(text);
+      }
       
       // 2. Kirim ke AI untuk membuat soal kuis berdasarkan materi
       const quizData = await generateQuiz(processed.content);
@@ -31,6 +56,7 @@ export default function Home() {
       console.log('Kuis berhasil dibuat:', quizData);
       
       setText('');
+      setAttachedFile(null);
       Alert.alert('Sukses', 'Materi berhasil dipelajari dan disimpan oleh AI!');
       
     } catch (error: any) {
@@ -66,22 +92,32 @@ export default function Home() {
         <TextInput
           style={styles.textInput}
           multiline
-          placeholder="Tuliskan atau tempel materi yang ingin dipelajari di sini..."
+          placeholder={attachedFile ? "File terlampir. Anda bisa menambahkan catatan opsional..." : "Tuliskan atau tempel materi yang ingin dipelajari di sini..."}
           placeholderTextColor="#999"
           value={text}
           onChangeText={setText}
           textAlignVertical="top"
         />
         
+        {attachedFile && (
+          <View style={styles.attachedFileContainer}>
+            <Ionicons name="document-text" size={20} color="#007AFF" />
+            <Text style={styles.attachedFileName} numberOfLines={1}>{attachedFile.name}</Text>
+            <TouchableOpacity onPress={() => setAttachedFile(null)}>
+              <Ionicons name="close-circle" size={24} color="#FF3B30" />
+            </TouchableOpacity>
+          </View>
+        )}
+        
         <View style={styles.bottomBar}>
-          <TouchableOpacity style={styles.attachButton}>
+          <TouchableOpacity style={styles.attachButton} onPress={handleAttach}>
             <Ionicons name="attach" size={28} color="#666" />
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={[styles.sendButton, (!text.trim() || isLoading) && styles.sendButtonDisabled]} 
+            style={[styles.sendButton, (!text.trim() && !attachedFile || isLoading) && styles.sendButtonDisabled]} 
             onPress={handleSend}
-            disabled={!text.trim() || isLoading}
+            disabled={(!text.trim() && !attachedFile) || isLoading}
           >
             {isLoading ? (
               <ActivityIndicator color="#fff" />
@@ -148,6 +184,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#333',
     lineHeight: 28,
+  },
+  attachedFileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#007AFF15',
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 12,
+    gap: 8,
+  },
+  attachedFileName: {
+    flex: 1,
+    color: '#007AFF',
+    fontWeight: '600',
   },
   bottomBar: {
     flexDirection: 'row',

@@ -1,33 +1,54 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { db, collection, getDocs, query } from '../config/firebase';
 
-// Mock data sementara, nantinya akan diambil dari Firestore (kumpulan soal acak)
-const MOCK_QUIZZES = [
-  {
-    id: '1',
-    question: 'Berdasarkan materi yang dipelajari, apa manfaat utama kecerdasan buatan?',
-    options: ['Mengurangi efisiensi', 'Menggantikan manusia sepenuhnya', 'Membantu proses otomatisasi & analisis', 'Menambah biaya produksi'],
-    correctAnswerIndex: 2,
-    explanation: 'AI sangat berguna untuk membantu otomatisasi tugas berulang dan melakukan analisis data dengan cepat.'
-  },
-  {
-    id: '2',
-    question: 'Manakah di bawah ini yang bukan merupakan bahasa pemrograman?',
-    options: ['Python', 'HTML', 'Java', 'C++'],
-    correctAnswerIndex: 1,
-    explanation: 'HTML adalah bahasa markup untuk membuat kerangka web, bukan bahasa pemrograman berlogika.'
-  }
-];
+interface QuizItem {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswerIndex: number;
+  explanation: string;
+  topic?: string;
+}
 
 export default function Quiz() {
   const router = useRouter();
+  const [quizzes, setQuizzes] = useState<QuizItem[]>([]);
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const currentQuiz = MOCK_QUIZZES[currentQuizIndex];
+  useEffect(() => {
+    fetchQuizzes();
+  }, []);
+
+  const fetchQuizzes = async () => {
+    setIsLoading(true);
+    try {
+      const q = query(collection(db, 'quizzes'));
+      const snapshot = await getDocs(q);
+      const data: QuizItem[] = [];
+      snapshot.forEach(doc => {
+        data.push({ id: doc.id, ...doc.data() } as QuizItem);
+      });
+      
+      if (data.length > 0) {
+        // Acak kuis
+        data.sort(() => Math.random() - 0.5);
+        setQuizzes(data);
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Gagal memuat kuis dari database.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const currentQuiz = quizzes[currentQuizIndex];
 
   const handleSelectOption = (index: number) => {
     if (isAnswered) return;
@@ -36,7 +57,7 @@ export default function Quiz() {
   };
 
   const handleNext = () => {
-    if (currentQuizIndex < MOCK_QUIZZES.length - 1) {
+    if (currentQuizIndex < quizzes.length - 1) {
       setCurrentQuizIndex(currentQuizIndex + 1);
       setSelectedOption(null);
       setIsAnswered(false);
@@ -45,11 +66,32 @@ export default function Quiz() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={{ marginTop: 16, color: '#666' }}>Memuat kuis dari database...</Text>
+      </View>
+    );
+  }
+
+  if (quizzes.length === 0) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Ionicons name="document-text-outline" size={64} color="#ccc" />
+        <Text style={{ marginTop: 16, color: '#666', textAlign: 'center' }}>Belum ada kuis. Masukkan materi terlebih dahulu di halaman utama.</Text>
+        <TouchableOpacity style={{ marginTop: 24, padding: 12, backgroundColor: '#007AFF', borderRadius: 8 }} onPress={() => router.back()}>
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Kembali</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {/* Kartu Pertanyaan */}
       <View style={styles.card}>
-        <Text style={styles.progress}>Pertanyaan {currentQuizIndex + 1} dari {MOCK_QUIZZES.length}</Text>
+        <Text style={styles.progress}>Pertanyaan {currentQuizIndex + 1} dari {quizzes.length}</Text>
         <Text style={styles.question}>{currentQuiz.question}</Text>
         
         <ScrollView style={styles.optionsContainer}>
@@ -107,7 +149,7 @@ export default function Quiz() {
         {isAnswered && (
           <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
             <Text style={styles.nextButtonText}>
-              {currentQuizIndex < MOCK_QUIZZES.length - 1 ? 'Lanjut' : 'Selesai'}
+              {currentQuizIndex < quizzes.length - 1 ? 'Lanjut' : 'Selesai'}
             </Text>
             <Ionicons name="arrow-forward" size={20} color="#fff" />
           </TouchableOpacity>

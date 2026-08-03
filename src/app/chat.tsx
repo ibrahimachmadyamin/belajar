@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Keyboa
 import { Ionicons } from '@expo/vector-icons';
 import { getApiKey } from '../config/storage';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { db, collection, getDocs, query } from '../config/firebase';
 
 interface Message {
   id: string;
@@ -16,6 +17,26 @@ export default function Chat() {
   ]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [contextData, setContextData] = useState<string>('');
+
+  React.useEffect(() => {
+    fetchContext();
+  }, []);
+
+  const fetchContext = async () => {
+    try {
+      const q = query(collection(db, 'materials'));
+      const snapshot = await getDocs(q);
+      let contextString = '';
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        contextString += `\nTopik: ${data.topic || 'Umum'}\nIsi: ${data.content}\n`;
+      });
+      setContextData(contextString);
+    } catch (error) {
+      console.log('Error fetching context', error);
+    }
+  };
 
   const handleSend = async () => {
     if (!inputText.trim()) return;
@@ -38,8 +59,14 @@ export default function Chat() {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
       
-      // Prompt untuk chatbot (idealnya kita pass konteks dari database Firestore di sini)
-      const prompt = `Anda adalah asisten cerdas. Jawab pertanyaan berikut dengan ramah dan edukatif. Jika perlu, gunakan Google Search untuk melengkapi data.
+      const prompt = `Anda adalah asisten cerdas untuk aplikasi belajar. Jawab pertanyaan berikut dengan ramah dan edukatif. 
+      Jika relevan, gunakan 'Ingatan Materi' berikut yang pernah dipelajari user untuk menjawab:
+      --- INGATAN MATERI ---
+      ${contextData || '(Belum ada materi yang dipelajari)'}
+      ----------------------
+      
+      Jika pertanyaan di luar materi, jawab sebisa Anda atau gunakan pengetahuan umum Anda.
+      
       Pertanyaan user: ${userMessage}`;
 
       const result = await model.generateContent(prompt);
