@@ -3,8 +3,7 @@ import { View, TextInput, TouchableOpacity, Text, StyleSheet, KeyboardAvoidingVi
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { processMaterial, generateQuiz } from '../services/ai';
-// import { db, collection, addDoc } from '../config/firebase'; 
-// TODO: Uncomment when firebase is properly configured by user
+import { db, collection, addDoc } from '../config/firebase'; 
 
 export default function Home() {
   const router = useRouter();
@@ -23,12 +22,10 @@ export default function Home() {
       const quizData = await generateQuiz(processed.content);
       
       // 3. Simpan ke Database
-      /*
       await addDoc(collection(db, 'materials'), processed);
       for (const q of quizData) {
         await addDoc(collection(db, 'quizzes'), { ...q, topic: processed.topic });
       }
-      */
       
       console.log('Materi berhasil diproses:', processed);
       console.log('Kuis berhasil dibuat:', quizData);

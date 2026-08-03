@@ -1,15 +1,13 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
 
-// TODO: Ganti dengan konfigurasi Firebase Anda
-// Anda bisa mendapatkan ini dari Firebase Console -> Project Settings
 const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAg65wTAQDgGNw2I7GOEMo_bBIsto0WrpQ",
+  authDomain: "aplikasi-belajar-ai.firebaseapp.com",
+  projectId: "aplikasi-belajar-ai",
+  storageBucket: "aplikasi-belajar-ai.firebasestorage.app",
+  messagingSenderId: "1036600305212",
+  appId: "1:1036600305212:web:cda5c66f1036a5e21a4539"
 };
 
 // Initialize Firebase
