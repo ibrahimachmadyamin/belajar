@@ -57,7 +57,7 @@ export default function Chat() {
       if (!apiKey) throw new Error("API Key belum diatur.");
       
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
       
       const prompt = `Anda adalah asisten cerdas untuk aplikasi belajar. Jawab pertanyaan berikut dengan ramah dan edukatif. 
       Jika relevan, gunakan 'Ingatan Materi' berikut yang pernah dipelajari user untuk menjawab:
