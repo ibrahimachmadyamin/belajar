@@ -12,7 +12,7 @@ const getGenAI = async () => {
 // Fungsi untuk merapikan teks materi
 export const processMaterial = async (rawText: string) => {
   const genAI = await getGenAI();
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' }); // Menggunakan model 2.5 Pro seperti request
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' }); // Menggunakan model 2.5 Pro seperti request
 
   const prompt = `
   Anda adalah asisten cerdas untuk aplikasi pembelajaran.
@@ -49,7 +49,7 @@ export const processMaterial = async (rawText: string) => {
 // Fungsi untuk mengekstrak dan merangkum dokumen (PDF/Word)
 export const processDocument = async (base64Data: string, mimeType: string) => {
   const genAI = await getGenAI();
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
   const prompt = `
   Anda adalah asisten cerdas. Saya melampirkan sebuah dokumen.
@@ -85,7 +85,7 @@ export const processDocument = async (base64Data: string, mimeType: string) => {
 // Fungsi untuk generate kuis
 export const generateQuiz = async (materialContent: string) => {
   const genAI = await getGenAI();
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
   const prompt = `
   Buat 5 soal pilihan ganda berdasarkan materi berikut.
