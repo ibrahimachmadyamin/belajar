@@ -69,7 +69,8 @@ export default function Home() {
   return (
     <KeyboardAvoidingView 
       style={styles.container} 
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 30}
     >
       {/* Header Navigation */}
       <View style={styles.header}>
