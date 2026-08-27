@@ -1,160 +1,174 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { db, collection, getDocs, query } from '../config/firebase';
+import { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { db } from "../config/firebase";
+import { collection, getDocs, query, limit, orderBy } from "firebase/firestore";
 
-interface QuizItem {
+interface Question {
   id: string;
   question: string;
   options: string[];
   correctAnswerIndex: number;
   explanation: string;
-  topic?: string;
 }
 
 export default function Quiz() {
   const router = useRouter();
-  const [quizzes, setQuizzes] = useState<QuizItem[]>([]);
-  const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [isAnswered, setIsAnswered] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchQuizzes();
+    fetchQuestions();
   }, []);
 
-  const fetchQuizzes = async () => {
-    setIsLoading(true);
+  const fetchQuestions = async () => {
+    setLoading(true);
     try {
-      const q = query(collection(db, 'quizzes'));
-      const snapshot = await getDocs(q);
-      const data: QuizItem[] = [];
-      snapshot.forEach(doc => {
-        data.push({ id: doc.id, ...doc.data() } as QuizItem);
+      // Untuk prototipe, kita ambil 50 soal terakhir (idealnya pakai random/algoritma lain)
+      const q = query(
+        collection(db, "questions"), 
+        orderBy("createdAt", "desc"),
+        limit(50)
+      );
+      const querySnapshot = await getDocs(q);
+      const loadedQuestions: Question[] = [];
+      querySnapshot.forEach((doc) => {
+        loadedQuestions.push({ id: doc.id, ...doc.data() } as Question);
       });
       
-      if (data.length > 0) {
-        // Acak kuis
-        data.sort(() => Math.random() - 0.5);
-        setQuizzes(data);
-      }
+      // Acak urutan soal
+      const shuffled = loadedQuestions.sort(() => 0.5 - Math.random());
+      setQuestions(shuffled);
     } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Gagal memuat kuis dari database.');
+      console.error("Gagal mengambil soal:", error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const currentQuiz = quizzes[currentQuizIndex];
-
-  const handleSelectOption = (index: number) => {
-    if (isAnswered) return;
+  const handleOptionSelect = (index: number) => {
+    if (selectedOption !== null) return; // Mencegah klik ganda setelah memilih
     setSelectedOption(index);
-    setIsAnswered(true);
   };
 
   const handleNext = () => {
-    if (currentQuizIndex < quizzes.length - 1) {
-      setCurrentQuizIndex(currentQuizIndex + 1);
-      setSelectedOption(null);
-      setIsAnswered(false);
+    setSelectedOption(null);
+    
+    // Jika soal hampir habis, di aplikasi nyata kita akan fetch lagi
+    // Untuk prototipe ini, kita putar balik kalau habis
+    if (currentIndex >= questions.length - 1) {
+      setCurrentIndex(0);
+      fetchQuestions(); // Ambil soal baru (acak ulang)
     } else {
-      router.back();
+      setCurrentIndex(prev => prev + 1);
     }
   };
 
-  if (isLoading) {
+  if (loading && questions.length === 0) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={{ marginTop: 16, color: '#666' }}>Memuat kuis dari database...</Text>
+      <View style={[styles.container, styles.centerAll]}>
+        <ActivityIndicator size="large" color="#FF6B6B" />
+        <Text style={styles.loadingText}>Menyiapkan rantai kuis...</Text>
       </View>
     );
   }
 
-  if (quizzes.length === 0) {
+  if (questions.length === 0) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Ionicons name="document-text-outline" size={64} color="#ccc" />
-        <Text style={{ marginTop: 16, color: '#666', textAlign: 'center' }}>Belum ada kuis. Masukkan materi terlebih dahulu di halaman utama.</Text>
-        <TouchableOpacity style={{ marginTop: 24, padding: 12, backgroundColor: '#007AFF', borderRadius: 8 }} onPress={() => router.back()}>
-          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Kembali</Text>
+      <View style={[styles.container, styles.centerAll, { padding: 20 }]}>
+        <Ionicons name="folder-open-outline" size={60} color="#8F90A6" />
+        <Text style={styles.emptyText}>Belum ada soal kuis.</Text>
+        <Text style={styles.emptySubText}>Silakan kembali ke Beranda dan buat soal dari materi terlebih dahulu.</Text>
+        <TouchableOpacity style={styles.actionButton} onPress={() => router.back()}>
+          <Text style={styles.actionButtonText}>Kembali ke Beranda</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
+  const currentQuestion = questions[currentIndex];
+  const isAnswered = selectedOption !== null;
+  const isCorrect = selectedOption === currentQuestion.correctAnswerIndex;
+
   return (
     <View style={styles.container}>
-      {/* Kartu Pertanyaan */}
-      <View style={styles.card}>
-        <Text style={styles.progress}>Pertanyaan {currentQuizIndex + 1} dari {quizzes.length}</Text>
-        <Text style={styles.question}>{currentQuiz.question}</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         
-        <ScrollView style={styles.optionsContainer}>
-          {currentQuiz.options.map((option, index) => {
-            let optionStyle = styles.optionButton;
+        {/* Progress & Header */}
+        <View style={styles.header}>
+          <View style={styles.badgeContainer}>
+            <Ionicons name="infinite" size={16} color="#FF6B6B" style={{marginRight: 4}}/>
+            <Text style={styles.badgeText}>Endless Mode</Text>
+          </View>
+        </View>
+
+        {/* Question Card */}
+        <View style={styles.questionCard}>
+          <Text style={styles.questionText}>{currentQuestion.question}</Text>
+        </View>
+
+        {/* Options */}
+        <View style={styles.optionsContainer}>
+          {currentQuestion.options.map((option, index) => {
+            let buttonStyle = styles.optionButton;
             let textStyle = styles.optionText;
+            let icon = null;
 
             if (isAnswered) {
-              if (index === currentQuiz.correctAnswerIndex) {
-                optionStyle = [styles.optionButton, styles.optionCorrect];
-                textStyle = [styles.optionText, styles.textCorrect];
+              if (index === currentQuestion.correctAnswerIndex) {
+                // Jawaban yang benar selalu disorot hijau setelah dijawab
+                buttonStyle = styles.optionButtonCorrect;
+                textStyle = styles.optionTextCorrect;
+                icon = <Ionicons name="checkmark-circle" size={24} color="#FFF" />;
               } else if (index === selectedOption) {
-                optionStyle = [styles.optionButton, styles.optionWrong];
-                textStyle = [styles.optionText, styles.textWrong];
+                // Jawaban yang dipilih pengguna tapi salah
+                buttonStyle = styles.optionButtonWrong;
+                textStyle = styles.optionTextWrong;
+                icon = <Ionicons name="close-circle" size={24} color="#FFF" />;
+              } else {
+                // Opsi lainnya yang tidak dipilih diredupkan
+                buttonStyle = styles.optionButtonDisabled;
+                textStyle = styles.optionTextDisabled;
               }
-            } else if (index === selectedOption) {
-              optionStyle = [styles.optionButton, styles.optionSelected];
             }
 
             return (
               <TouchableOpacity
                 key={index}
-                style={optionStyle}
-                onPress={() => handleSelectOption(index)}
+                style={[buttonStyle, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}
                 activeOpacity={0.7}
+                onPress={() => handleOptionSelect(index)}
+                disabled={isAnswered}
               >
-                <Text style={textStyle}>{option}</Text>
+                <Text style={[textStyle, { flex: 1, paddingRight: 10 }]}>{option}</Text>
+                {icon}
               </TouchableOpacity>
             );
           })}
-        </ScrollView>
-        
-        {/* Penjelasan jika sudah menjawab */}
+        </View>
+
+        {/* Explanation & Next Button */}
         {isAnswered && (
-          <View style={styles.explanationBox}>
-            <View style={styles.explanationHeader}>
-              <Ionicons 
-                name={selectedOption === currentQuiz.correctAnswerIndex ? 'checkmark-circle' : 'close-circle'} 
-                size={20} 
-                color={selectedOption === currentQuiz.correctAnswerIndex ? '#34C759' : '#FF3B30'} 
-              />
-              <Text style={styles.explanationTitle}>Penjelasan</Text>
+          <View style={styles.feedbackContainer}>
+            <View style={[styles.explanationCard, { borderColor: isCorrect ? 'rgba(78, 205, 196, 0.3)' : 'rgba(255, 107, 107, 0.3)' }]}>
+              <Text style={[styles.feedbackTitle, { color: isCorrect ? "#4ECDC4" : "#FF6B6B" }]}>
+                {isCorrect ? "Jawaban Anda Benar! 🎉" : "Kurang Tepat 🤔"}
+              </Text>
+              <Text style={styles.explanationText}>
+                {currentQuestion.explanation}
+              </Text>
             </View>
-            <Text style={styles.explanationText}>{currentQuiz.explanation}</Text>
+            
+            <TouchableOpacity style={styles.nextButton} activeOpacity={0.8} onPress={handleNext}>
+              <Text style={styles.nextButtonText}>Lanjut ke Soal Berikutnya</Text>
+              <Ionicons name="arrow-forward" size={20} color="#FFF" />
+            </TouchableOpacity>
           </View>
         )}
-      </View>
-
-      {/* Tombol Bawah */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.exitButton} onPress={() => router.back()}>
-          <Text style={styles.exitButtonText}>Keluar</Text>
-        </TouchableOpacity>
-        
-        {isAnswered && (
-          <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-            <Text style={styles.nextButtonText}>
-              {currentQuizIndex < quizzes.length - 1 ? 'Lanjut' : 'Selesai'}
-            </Text>
-            <Ionicons name="arrow-forward" size={20} color="#fff" />
-          </TouchableOpacity>
-        )}
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -162,127 +176,167 @@ export default function Quiz() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
-    padding: 20,
+    backgroundColor: "#0F0F1A",
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 24,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 4,
-    flex: 1,
-    marginBottom: 20,
+  centerAll: {
+    justifyContent: "center",
+    alignItems: "center",
   },
-  progress: {
-    fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '600',
-    marginBottom: 12,
-  },
-  question: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    lineHeight: 32,
-    marginBottom: 24,
-  },
-  optionsContainer: {
-    flex: 1,
-  },
-  optionButton: {
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: '#E5E5EA',
-    marginBottom: 12,
-    backgroundColor: '#fff',
-  },
-  optionSelected: {
-    borderColor: '#007AFF',
-    backgroundColor: '#007AFF0A',
-  },
-  optionCorrect: {
-    borderColor: '#34C759',
-    backgroundColor: '#34C75910',
-  },
-  optionWrong: {
-    borderColor: '#FF3B30',
-    backgroundColor: '#FF3B3010',
-  },
-  optionText: {
+  loadingText: {
+    color: "#8F90A6",
+    marginTop: 16,
     fontSize: 16,
-    color: '#444',
   },
-  textCorrect: {
-    color: '#248A3D',
-    fontWeight: '600',
-  },
-  textWrong: {
-    color: '#C92A20',
-    fontWeight: '600',
-  },
-  explanationBox: {
-    marginTop: 20,
-    padding: 16,
-    backgroundColor: '#F2F2F7',
-    borderRadius: 16,
-  },
-  explanationHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  emptyText: {
+    color: "#FFF",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 16,
     marginBottom: 8,
   },
-  explanationTitle: {
-    fontWeight: 'bold',
-    color: '#333',
-    fontSize: 16,
-  },
-  explanationText: {
-    color: '#555',
+  emptySubText: {
+    color: "#8F90A6",
+    textAlign: "center",
+    marginBottom: 24,
     lineHeight: 22,
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 16,
+  actionButton: {
+    backgroundColor: "#FF6B6B",
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
   },
-  exitButton: {
-    padding: 16,
-    borderRadius: 16,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    flex: 1,
-    alignItems: 'center',
-  },
-  exitButtonText: {
-    color: '#666',
-    fontWeight: '600',
+  actionButtonText: {
+    color: "#FFF",
+    fontWeight: "bold",
     fontSize: 16,
   },
-  nextButton: {
-    padding: 16,
-    borderRadius: 16,
-    backgroundColor: '#007AFF',
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-    shadowColor: '#007AFF',
+  scrollContent: {
+    padding: 24,
+    paddingBottom: 40,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  badgeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: 'rgba(255, 107, 107, 0.15)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 107, 107, 0.3)',
+  },
+  badgeText: {
+    color: "#FF6B6B",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+  questionCard: {
+    backgroundColor: "#1A1A2E",
+    padding: 24,
+    borderRadius: 20,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
     elevation: 4,
   },
-  nextButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+  questionText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    lineHeight: 28,
+    fontWeight: "600",
+  },
+  optionsContainer: {
+    gap: 12,
+  },
+  optionButton: {
+    backgroundColor: "#2A2A3E",
+    padding: 18,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  optionText: {
+    color: "#FFFFFF",
     fontSize: 16,
   },
+  optionButtonCorrect: {
+    backgroundColor: "#4ECDC4", // Green
+    padding: 18,
+    borderRadius: 16,
+  },
+  optionTextCorrect: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  optionButtonWrong: {
+    backgroundColor: "#FF6B6B", // Red
+    padding: 18,
+    borderRadius: 16,
+  },
+  optionTextWrong: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  optionButtonDisabled: {
+    backgroundColor: "#1A1A2E",
+    padding: 18,
+    borderRadius: 16,
+    opacity: 0.5,
+  },
+  optionTextDisabled: {
+    color: "#8F90A6",
+    fontSize: 16,
+  },
+  feedbackContainer: {
+    marginTop: 32,
+    animation: "fadeIn 0.5s", // pseudo representation, rn handles it statically unless reanimated is used
+  },
+  explanationCard: {
+    backgroundColor: "#1A1A2E",
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginBottom: 24,
+  },
+  feedbackTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  explanationText: {
+    color: "#E0E0E0",
+    fontSize: 15,
+    lineHeight: 24,
+  },
+  nextButton: {
+    backgroundColor: "#FF6B6B",
+    flexDirection: "row",
+    padding: 18,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#FF6B6B",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 6,
+    gap: 8,
+  },
+  nextButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  }
 });

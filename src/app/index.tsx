@@ -1,230 +1,141 @@
-import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
-import { processMaterial, generateQuiz, processDocument } from '../services/ai';
-import { db, collection, addDoc } from '../config/firebase'; 
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions } from "react-native";
+import { Link } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient"; // Need to check if installed, if not we will just use flat colors for now.
+// Actually, let's use flat premium colors to be safe since expo-linear-gradient might not be installed in the package.json.
+// Wait, looking at package.json, expo-linear-gradient is NOT installed. I will use standard StyleSheet with nice shadows and colors.
+
+const { width } = Dimensions.get("window");
 
 export default function Home() {
-  const router = useRouter();
-  const [text, setText] = useState('');
-  const [attachedFile, setAttachedFile] = useState<DocumentPicker.DocumentPickerAsset | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleAttach = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'],
-      });
-      if (!result.canceled && result.assets.length > 0) {
-        setAttachedFile(result.assets[0]);
-      }
-    } catch (error) {
-      console.log('Error picking document', error);
-    }
-  };
-
-  const handleSend = async () => {
-    if (!text.trim() && !attachedFile) return;
-    
-    setIsLoading(true);
-    try {
-      let processed: any = null;
-      
-      if (attachedFile) {
-        // Baca file menjadi Base64
-        const base64Data = await FileSystem.readAsStringAsync(attachedFile.uri, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-        processed = await processDocument(base64Data, attachedFile.mimeType || 'application/pdf');
-      } else {
-        processed = await processMaterial(text);
-      }
-      
-      // 2. Kirim ke AI untuk membuat soal kuis berdasarkan materi
-      const quizData = await generateQuiz(processed.content);
-      
-      // 3. Simpan ke Database
-      await addDoc(collection(db, 'materials'), processed);
-      for (const q of quizData) {
-        await addDoc(collection(db, 'quizzes'), { ...q, topic: processed.topic });
-      }
-      
-      console.log('Materi berhasil diproses:', processed);
-      console.log('Kuis berhasil dibuat:', quizData);
-      
-      setText('');
-      setAttachedFile(null);
-      Alert.alert('Sukses', 'Materi berhasil dipelajari dan disimpan oleh AI!');
-      
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Gagal memproses materi.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
-      behavior="padding"
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 30}
-    >
-      {/* Header Navigation */}
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.navButton} onPress={() => router.push('/settings')}>
-          <Ionicons name="settings-outline" size={24} color="#333" />
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.navButton, styles.navButtonMain]} onPress={() => router.push('/quiz')}>
-          <Ionicons name="school-outline" size={24} color="#fff" />
-          <Text style={styles.navButtonText}>Quiz</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.navButton} onPress={() => router.push('/chat')}>
-          <Ionicons name="chatbubbles-outline" size={24} color="#333" />
-        </TouchableOpacity>
+        <View style={styles.iconContainer}>
+          <Ionicons name="infinite" size={60} color="#FF6B6B" />
+        </View>
+        <Text style={styles.title}>Quiz<Text style={styles.titleHighlight}>Chain</Text></Text>
+        <Text style={styles.subtitle}>
+          Belajar tanpa batas. Generate kuis pilihan ganda dari materimu sendiri menggunakan kekuatan AI.
+        </Text>
       </View>
 
-      {/* Main Input Area */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.textInput}
-          multiline
-          placeholder={attachedFile ? "File terlampir. Anda bisa menambahkan catatan opsional..." : "Tuliskan atau tempel materi yang ingin dipelajari di sini..."}
-          placeholderTextColor="#999"
-          value={text}
-          onChangeText={setText}
-          textAlignVertical="top"
-        />
-        
-        {attachedFile && (
-          <View style={styles.attachedFileContainer}>
-            <Ionicons name="document-text" size={20} color="#007AFF" />
-            <Text style={styles.attachedFileName} numberOfLines={1}>{attachedFile.name}</Text>
-            <TouchableOpacity onPress={() => setAttachedFile(null)}>
-              <Ionicons name="close-circle" size={24} color="#FF3B30" />
-            </TouchableOpacity>
-          </View>
-        )}
-        
-        <View style={styles.bottomBar}>
-          <TouchableOpacity style={styles.attachButton} onPress={handleAttach}>
-            <Ionicons name="attach" size={28} color="#666" />
+      <View style={styles.actionContainer}>
+        <Link href="/quiz" asChild>
+          <TouchableOpacity style={styles.primaryCard} activeOpacity={0.8}>
+            <View style={styles.cardIcon}>
+              <Ionicons name="play" size={32} color="#FFF" />
+            </View>
+            <View style={styles.cardTextContainer}>
+              <Text style={styles.cardTitle}>Mulai Kuis</Text>
+              <Text style={styles.cardSubtitle}>Jawab rantai soal tanpa henti</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color="#rgba(255,255,255,0.5)" />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.sendButton, (!text.trim() && !attachedFile || isLoading) && styles.sendButtonDisabled]} 
-            onPress={handleSend}
-            disabled={(!text.trim() && !attachedFile) || isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Ionicons name="send" size={20} color="#fff" />
-            )}
+        </Link>
+
+        <Link href="/create" asChild>
+          <TouchableOpacity style={styles.secondaryCard} activeOpacity={0.8}>
+            <View style={[styles.cardIcon, { backgroundColor: 'rgba(78, 205, 196, 0.2)' }]}>
+              <Ionicons name="add-circle" size={32} color="#4ECDC4" />
+            </View>
+            <View style={styles.cardTextContainer}>
+              <Text style={styles.cardTitle}>Buat Soal Baru</Text>
+              <Text style={styles.cardSubtitle}>Generate dari teks materi AI</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color="#rgba(255,255,255,0.5)" />
           </TouchableOpacity>
-        </View>
+        </Link>
       </View>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
-    paddingTop: 50,
+    backgroundColor: "#0F0F1A", // Premium dark background
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 30,
+    marginTop: 50,
+  },
+  iconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 107, 107, 0.3)',
   },
-  navButton: {
-    padding: 12,
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+  title: {
+    fontSize: 42,
+    fontWeight: "900",
+    color: "#FFFFFF",
+    letterSpacing: 1,
   },
-  navButtonMain: {
-    backgroundColor: '#007AFF',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    gap: 8,
+  titleHighlight: {
+    color: "#FF6B6B", // Coral pink highlight
   },
-  navButtonText: {
-    color: '#fff',
-    fontWeight: '600',
+  subtitle: {
     fontSize: 16,
+    color: "#8F90A6",
+    textAlign: "center",
+    marginTop: 15,
+    lineHeight: 24,
   },
-  inputContainer: {
-    flex: 1,
-    marginHorizontal: 20,
-    marginBottom: 20,
-    backgroundColor: '#fff',
-    borderRadius: 24,
+  actionContainer: {
+    padding: 24,
+    paddingBottom: 50,
+    gap: 20,
+  },
+  primaryCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FF6B6B", // Coral primary
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  textInput: {
-    flex: 1,
-    fontSize: 18,
-    color: '#333',
-    lineHeight: 28,
-  },
-  attachedFileContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#007AFF15',
-    padding: 12,
-    borderRadius: 12,
-    marginTop: 12,
-    gap: 8,
-  },
-  attachedFileName: {
-    flex: 1,
-    color: '#007AFF',
-    fontWeight: '600',
-  },
-  bottomBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  attachButton: {
-    padding: 8,
-  },
-  sendButton: {
-    backgroundColor: '#007AFF',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 4 },
+    borderRadius: 24,
+    shadowColor: "#FF6B6B",
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowRadius: 15,
+    elevation: 8,
   },
-  sendButtonDisabled: {
-    backgroundColor: '#ccc',
-    shadowOpacity: 0,
-    elevation: 0,
+  secondaryCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1A1A2E", // Dark card
+    padding: 20,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  cardIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  cardTextContainer: {
+    flex: 1,
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    marginBottom: 4,
+  },
+  cardSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.7)',
   },
 });
