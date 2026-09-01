@@ -27,14 +27,20 @@ export async function generateQuestionsFromText(text: string): Promise<QuizQuest
 
   const prompt = `
 Anda adalah seorang pembuat soal kuis yang ahli.
-Buatkan 5 soal pilihan ganda berdasarkan teks berikut ini.
-Format balasannya HARUS dalam bentuk JSON array dengan struktur objek berikut untuk setiap soal:
-{
-  "question": "pertanyaan",
-  "options": ["Opsi 1", "Opsi 2", "Opsi 3", "Opsi 4"],
-  "correctAnswerIndex": <angka 0-3 yang merepresentasikan indeks opsi benar>,
-  "explanation": "Penjelasan singkat mengapa jawaban tersebut benar"
-}
+Tugas Anda adalah membaca teks materi berikut dan membuatkan soal pilihan ganda.
+Jumlah soal yang dibuat harus disesuaikan dengan panjang dan detail materi:
+- Jika materinya sangat pendek (misal 1 kalimat), buatkan 1 atau 2 soal saja.
+- Jika materinya panjang (misal sebuah artikel), buatkan hingga maksimal 10 soal.
+
+Format balasannya HARUS dalam bentuk murni JSON array (tanpa format markdown, tanpa tag \`\`\`json) dengan struktur objek berikut untuk setiap soal:
+[
+  {
+    "question": "pertanyaan",
+    "options": ["Opsi 1", "Opsi 2", "Opsi 3", "Opsi 4"],
+    "correctAnswerIndex": <angka 0-3 yang merepresentasikan indeks opsi benar>,
+    "explanation": "Penjelasan singkat mengapa jawaban tersebut benar"
+  }
+]
 
 Teks materi:
 """
@@ -44,7 +50,10 @@ ${text}
 
   try {
     const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    let responseText = result.response.text();
+    
+    // Membersihkan teks dari markdown (misalnya ```json ... ```) agar aman di-parse
+    responseText = responseText.replace(/^```json\n?/gm, '').replace(/^```\n?/gm, '').trim();
     
     // Parsing JSON hasil dari AI
     const questions: QuizQuestion[] = JSON.parse(responseText);

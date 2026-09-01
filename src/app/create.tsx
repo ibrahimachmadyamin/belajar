@@ -23,8 +23,8 @@ export default function CreateQuiz() {
   const router = useRouter();
 
   const handleGenerate = async () => {
-    if (material.trim().length < 50) {
-      Alert.alert("Teks Terlalu Pendek", "Mohon masukkan materi yang cukup panjang agar AI bisa membuat soal yang berkualitas.");
+    if (material.trim().length < 10) {
+      Alert.alert("Teks Terlalu Pendek", "Mohon masukkan materi yang cukup panjang (minimal 10 karakter) agar AI bisa membuat soal.");
       return;
     }
 
@@ -80,7 +80,7 @@ export default function CreateQuiz() {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.textArea}
-            placeholder="Ketik atau paste materi pembelajaran di sini (minimal 50 karakter)..."
+            placeholder="Ketik atau paste materi pembelajaran di sini (minimal 10 karakter)..."
             placeholderTextColor="#5C5C70"
             multiline
             numberOfLines={10}
