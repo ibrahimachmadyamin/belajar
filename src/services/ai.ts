@@ -17,13 +17,18 @@ export async function generateQuestionsFromText(text: string): Promise<QuizQuest
   }
 
   // Menggunakan model yang direkomendasikan untuk tugas teks (sekarang versi 3.7)
-  const model = genAI.getGenerativeModel({
-    model: "gemini-3.7-flash",
-    generationConfig: {
-      temperature: 0.2, // Rendah agar lebih deterministik
-      responseMimeType: "application/json",
+  const model = genAI.getGenerativeModel(
+    {
+      model: "gemini-3.7-flash",
+      generationConfig: {
+        temperature: 0.2, // Rendah agar lebih deterministik
+        responseMimeType: "application/json",
+      },
     },
-  });
+    { 
+      timeout: 180000 // Timeout 3 menit (180.000 ms) sesuai permintaan user
+    }
+  );
 
   const prompt = `
 Anda adalah seorang pembuat soal kuis yang ahli.
