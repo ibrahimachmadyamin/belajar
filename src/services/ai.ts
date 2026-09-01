@@ -16,9 +16,9 @@ export async function generateQuestionsFromText(text: string): Promise<QuizQuest
     throw new Error("API Key Gemini belum dikonfigurasi.");
   }
 
-  // Menggunakan model yang direkomendasikan untuk tugas teks (sekarang versi 2.5)
+  // Menggunakan model yang direkomendasikan untuk tugas teks (sekarang versi 3.7)
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.7-flash",
     generationConfig: {
       temperature: 0.2, // Rendah agar lebih deterministik
       responseMimeType: "application/json",
