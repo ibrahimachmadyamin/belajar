@@ -53,18 +53,38 @@ ${text}
 """
 `;
 
-  try {
-    const result = await model.generateContent(prompt);
-    let responseText = result.response.text();
-    
-    // Membersihkan teks dari markdown (misalnya ```json ... ```) agar aman di-parse
-    responseText = responseText.replace(/^```json\n?/gm, '').replace(/^```\n?/gm, '').trim();
-    
-    // Parsing JSON hasil dari AI
-    const questions: QuizQuestion[] = JSON.parse(responseText);
-    return questions;
-  } catch (error) {
-    console.error("Error generating questions:", error);
-    throw error;
+  let retries = 3;
+  let lastError = null;
+
+  while (retries > 0) {
+    try {
+      const result = await model.generateContent(prompt);
+      let responseText = result.response.text();
+      
+      // Membersihkan teks dari markdown (misalnya ```json ... ```) agar aman di-parse
+      responseText = responseText.replace(/^```json\n?/gm, '').replace(/^```\n?/gm, '').trim();
+      
+      // Parsing JSON hasil dari AI
+      const questions: QuizQuestion[] = JSON.parse(responseText);
+      return questions;
+    } catch (error: any) {
+      console.error(`Error generating questions (Retries left: ${retries - 1}):`, error);
+      lastError = error;
+      
+      // Jika error 503 (High Demand), tunggu 3 detik lalu coba lagi
+      if (error.message && error.message.includes("503")) {
+        retries--;
+        if (retries > 0) {
+          console.log("Server sibuk. Mencoba lagi dalam 3 detik...");
+          await new Promise(resolve => setTimeout(resolve, 3000)); // Tunggu 3 detik
+          continue;
+        }
+      } else {
+        // Jika error selain 503, langsung lempar errornya
+        throw error;
+      }
+    }
   }
+  
+  throw lastError;
 }
