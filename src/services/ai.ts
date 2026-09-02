@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 
 // Menyimpan API Key dengan string dipecah untuk menghindari blokir dari GitHub Push Protection
 const apiKey = "AQ.Ab8RN6IRRP7hSF-" + "pbVYNsruLKXYavNueNVyI7y7Yf3deEn6vYw";
@@ -16,6 +16,27 @@ export async function generateQuestionsFromText(text: string): Promise<QuizQuest
     throw new Error("API Key Gemini belum dikonfigurasi.");
   }
 
+  // Definisi skema JSON yang memaksa AI untuk selalu menjawab dengan format baku
+  // Ini memastikan aplikasi sangat stabil dan tahan banting (anti JSON parse error)
+  const questionSchema = {
+    type: SchemaType.ARRAY,
+    description: "Daftar pertanyaan kuis pilihan ganda",
+    items: {
+      type: SchemaType.OBJECT,
+      properties: {
+        question: { type: SchemaType.STRING, description: "Teks pertanyaan" },
+        options: { 
+          type: SchemaType.ARRAY, 
+          items: { type: SchemaType.STRING },
+          description: "Minimal 4 opsi jawaban"
+        },
+        correctAnswerIndex: { type: SchemaType.INTEGER, description: "Angka indeks untuk jawaban benar (mulai dari 0)" },
+        explanation: { type: SchemaType.STRING, description: "Penjelasan jawaban" }
+      },
+      required: ["question", "options", "correctAnswerIndex", "explanation"]
+    }
+  };
+
   // Menggunakan model yang direkomendasikan untuk tugas teks (sekarang versi 3.7)
   const model = genAI.getGenerativeModel(
     {
@@ -23,6 +44,7 @@ export async function generateQuestionsFromText(text: string): Promise<QuizQuest
       generationConfig: {
         temperature: 0.2, // Rendah agar lebih deterministik
         responseMimeType: "application/json",
+        responseSchema: questionSchema, // <--- Memaksa AI mengikuti struktur JSON
       },
     },
     { 
@@ -36,16 +58,6 @@ Tugas Anda adalah membaca teks materi berikut dan membuatkan soal pilihan ganda.
 Jumlah soal yang dibuat harus disesuaikan dengan panjang dan detail materi:
 - Jika materinya sangat pendek (misal 1 kalimat), buatkan 1 atau 2 soal saja.
 - Jika materinya panjang (misal sebuah artikel), buatkan hingga maksimal 10 soal.
-
-Format balasannya HARUS dalam bentuk murni JSON array (tanpa format markdown, tanpa tag \`\`\`json) dengan struktur objek berikut untuk setiap soal:
-[
-  {
-    "question": "pertanyaan",
-    "options": ["Opsi 1", "Opsi 2", "Opsi 3", "Opsi 4"],
-    "correctAnswerIndex": <angka 0-3 yang merepresentasikan indeks opsi benar>,
-    "explanation": "Penjelasan singkat mengapa jawaban tersebut benar"
-  }
-]
 
 Teks materi:
 """
