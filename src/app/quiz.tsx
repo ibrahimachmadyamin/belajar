@@ -20,7 +20,6 @@ export default function Quiz() {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-    try {
       const loadedQuestions = await getLocalQuestions();
       
       // Ambil maksimal 50 soal secara acak untuk sesi kuis ini
