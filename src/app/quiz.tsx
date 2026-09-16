@@ -2,16 +2,9 @@ import { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { db } from "../config/firebase";
-import { collection, getDocs, query, limit, orderBy } from "firebase/firestore";
+import { getLocalQuestions, LocalQuestion } from "../services/storage";
 
-interface Question {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswerIndex: number;
-  explanation: string;
-}
+interface Question extends LocalQuestion {}
 
 export default function Quiz() {
   const router = useRouter();
@@ -27,21 +20,13 @@ export default function Quiz() {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      // Untuk prototipe, kita ambil 50 soal terakhir (idealnya pakai random/algoritma lain)
-      const q = query(
-        collection(db, "questions"), 
-        orderBy("createdAt", "desc"),
-        limit(50)
-      );
-      const querySnapshot = await getDocs(q);
-      const loadedQuestions: Question[] = [];
-      querySnapshot.forEach((doc) => {
-        loadedQuestions.push({ id: doc.id, ...doc.data() } as Question);
-      });
+    try {
+      const loadedQuestions = await getLocalQuestions();
       
-      // Acak urutan soal
+      // Ambil maksimal 50 soal secara acak untuk sesi kuis ini
+      // Di aplikasi nyata, kita bisa tambahkan fitur pagination atau limit.
       const shuffled = loadedQuestions.sort(() => 0.5 - Math.random());
-      setQuestions(shuffled);
+      setQuestions(shuffled.slice(0, 50));
     } catch (error) {
       console.error("Gagal mengambil soal:", error);
     } finally {

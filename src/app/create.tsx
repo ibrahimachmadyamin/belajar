@@ -14,8 +14,7 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { generateQuestionsFromText } from "../services/ai";
-import { db } from "../config/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { saveQuestionsLocally } from "../services/storage";
 
 export default function CreateQuiz() {
   const [material, setMaterial] = useState("");
@@ -37,18 +36,8 @@ export default function CreateQuiz() {
         throw new Error("AI tidak mengembalikan soal.");
       }
 
-      // 2. Simpan ke Firebase
-      const questionsRef = collection(db, "questions");
-      let successCount = 0;
-      
-      // Kita simpan satu per satu agar mudah di-query secara acak nanti
-      for (const q of questions) {
-        await addDoc(questionsRef, {
-          ...q,
-          createdAt: serverTimestamp()
-        });
-        successCount++;
-      }
+      // 2. Simpan ke Local Storage (AsyncStorage)
+      const successCount = await saveQuestionsLocally(questions);
 
       Alert.alert(
         "Sukses!", 

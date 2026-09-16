@@ -1,13 +1,11 @@
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions } from "react-native";
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient"; // Need to check if installed, if not we will just use flat colors for now.
-// Actually, let's use flat premium colors to be safe since expo-linear-gradient might not be installed in the package.json.
-// Wait, looking at package.json, expo-linear-gradient is NOT installed. I will use standard StyleSheet with nice shadows and colors.
 
 const { width } = Dimensions.get("window");
 
 export default function Home() {
+  const router = useRouter();
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -16,36 +14,43 @@ export default function Home() {
         </View>
         <Text style={styles.title}>Quiz<Text style={styles.titleHighlight}>Chain</Text></Text>
         <Text style={styles.subtitle}>
-          Belajar tanpa batas. Generate kuis pilihan ganda dari materimu sendiri menggunakan kekuatan AI.
+          Belajar tanpa batas. Generate kuis dari materimu secara lokal.
         </Text>
       </View>
 
       <View style={styles.actionContainer}>
-        <Link href="/quiz" asChild>
-          <TouchableOpacity style={styles.primaryCard} activeOpacity={0.8}>
-            <View style={styles.cardIcon}>
-              <Ionicons name="play" size={32} color="#FFF" />
-            </View>
-            <View style={styles.cardTextContainer}>
-              <Text style={styles.cardTitle}>Mulai Kuis</Text>
-              <Text style={styles.cardSubtitle}>Jawab rantai soal tanpa henti</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={24} color="#rgba(255,255,255,0.5)" />
-          </TouchableOpacity>
-        </Link>
+        <TouchableOpacity style={styles.primaryCard} activeOpacity={0.8} onPress={() => router.push("/quiz")}>
+          <View style={styles.cardIcon}>
+            <Ionicons name="play" size={32} color="#FFF" />
+          </View>
+          <View style={styles.cardTextContainer}>
+            <Text style={styles.cardTitle}>Mulai Kuis</Text>
+            <Text style={styles.cardSubtitle}>Mainkan soal secara offline</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={24} color="#rgba(255,255,255,0.5)" />
+        </TouchableOpacity>
 
-        <Link href="/create" asChild>
-          <TouchableOpacity style={styles.secondaryCard} activeOpacity={0.8}>
-            <View style={[styles.cardIcon, { backgroundColor: 'rgba(78, 205, 196, 0.2)' }]}>
-              <Ionicons name="add-circle" size={32} color="#4ECDC4" />
-            </View>
-            <View style={styles.cardTextContainer}>
-              <Text style={styles.cardTitle}>Buat Soal Baru</Text>
-              <Text style={styles.cardSubtitle}>Generate dari teks materi AI</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={24} color="#rgba(255,255,255,0.5)" />
-          </TouchableOpacity>
-        </Link>
+        <TouchableOpacity style={[styles.secondaryCard, { borderColor: '#4ECDC4' }]} activeOpacity={0.8} onPress={() => router.push("/create")}>
+          <View style={[styles.cardIcon, { backgroundColor: 'rgba(78, 205, 196, 0.2)' }]}>
+            <Ionicons name="add-circle" size={32} color="#4ECDC4" />
+          </View>
+          <View style={styles.cardTextContainer}>
+            <Text style={styles.cardTitle}>Buat Soal Baru</Text>
+            <Text style={[styles.cardSubtitle, { color: '#8F90A6' }]}>Generate dengan AI</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={24} color="#rgba(255,255,255,0.5)" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.secondaryCard, { borderColor: '#FFD166' }]} activeOpacity={0.8} onPress={() => router.push("/bank")}>
+          <View style={[styles.cardIcon, { backgroundColor: 'rgba(255, 209, 102, 0.2)' }]}>
+            <Ionicons name="library" size={32} color="#FFD166" />
+          </View>
+          <View style={styles.cardTextContainer}>
+            <Text style={styles.cardTitle}>Bank Soal</Text>
+            <Text style={[styles.cardSubtitle, { color: '#8F90A6' }]}>Kelola & Ekspor Soal Lokal</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={24} color="#rgba(255,255,255,0.5)" />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
