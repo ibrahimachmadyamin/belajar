@@ -37,10 +37,10 @@ export async function generateQuestionsFromText(text: string): Promise<QuizQuest
     }
   };
 
-  // Menggunakan model yang direkomendasikan untuk tugas teks (sekarang versi 3.7)
+  // Menggunakan model terbaru (3.8-flash)
   const model = genAI.getGenerativeModel(
     {
-      model: "gemini-3.7-flash",
+      model: "gemini-3.8-flash",
       generationConfig: {
         temperature: 0.2, // Rendah agar lebih deterministik
         responseMimeType: "application/json",
