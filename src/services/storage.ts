@@ -1,8 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
+import { StorageAccessFramework } from 'expo-file-system/legacy';
 import { QuizQuestion } from './ai';
 
-const { StorageAccessFramework } = FileSystem;
 const DIRECTORY_URI_KEY = '@quiz_directory_uri';
 
 export interface LocalQuestion extends QuizQuestion {
