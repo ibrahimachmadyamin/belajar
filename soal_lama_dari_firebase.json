@@ -1,0 +1,878 @@
+[
+  {
+    "id": "0VXadSd7ycfHMVH4P6fk",
+    "question": "Berapa ketentuan minimal ketinggian lantai gardu dari jalan utama dan apa tujuannya?",
+    "correctAnswerIndex": 1,
+    "explanation": "Ketinggian lantai gardu minimal 30 cm dari ketinggian jalan utama untuk menghindari genangan air.",
+    "options": [
+      "Minimal 20 cm untuk memudahkan akses kendaraan PLN",
+      "Minimal 30 cm untuk menghindari genangan air",
+      "Minimal 50 cm untuk sirkulasi udara di bawah gardu",
+      "Minimal 100 cm untuk standar keselamatan tegangan menengah"
+    ]
+  },
+  {
+    "id": "1Gt1VaKHCCxP2AHuHYUK",
+    "question": "Mengapa recloser (penutup balik otomatis) sangat berguna pada jaringan distribusi udara?",
+    "correctAnswerIndex": 0,
+    "explanation": "Recloser sangat berguna karena sebagian besar gangguan pada jaringan udara bersifat sementara (misalnya ranting pohon yang menyentuh lalu lepas), sehingga penutupan kembali secara otomatis memulihkan jaringan tanpa tindakan manual.",
+    "options": [
+      "Karena sebagian besar gangguan pada jaringan udara bersifat sementara, seperti sentuhan dahan pohon",
+      "Karena recloser dapat menggantikan fungsi trafo distribusi",
+      "Karena recloser mampu menopang beban mekanis tiang dari tiupan angin kencang",
+      "Karena recloser dapat meningkatkan tegangan distribusi dari 20 kV menjadi 150 kV"
+    ]
+  },
+  {
+    "id": "2l9slvK7ZoRBeXdTRapp",
+    "question": "Berdasarkan aturan pemasangan, pentanahan (grounding) pada jaringan SUTR diatur setiap berapa tiang sekali?",
+    "correctAnswerIndex": 1,
+    "explanation": "Grounding SUTR diatur setiap 4 tiang sekali, atau minimal dipasang di awal, tengah, dan akhir jaringan.",
+    "options": [
+      "Setiap 2 tiang sekali",
+      "Setiap 4 tiang sekali",
+      "Setiap 6 tiang sekali",
+      "Setiap 8 tiang sekali"
+    ]
+  },
+  {
+    "id": "33TPWJBgLYKHRZAZw6Lc",
+    "question": "Berapakah kapasitas arus maksimum untuk LBS (Load Break Switch) Motorized 20 kV sesuai materi?",
+    "correctAnswerIndex": 1,
+    "explanation": "LBS Motorized merupakan sakelar pemutus beban 20 kV dengan kapasitas arus hingga 630 A yang dilengkapi motor penggerak dan boks kontrol.",
+    "options": [
+      "400 A",
+      "630 A",
+      "800 A",
+      "1000 A"
+    ]
+  },
+  {
+    "id": "35GeSCDxXQlDpotQvhNO",
+    "question": "Kapan konstruksi penyangga Druck Schoor (Topang Tekan - S.6) digunakan pada tiang jaringan listrik?",
+    "correctAnswerIndex": 1,
+    "explanation": "Druck Schoor digunakan apabila pada bagian belakang tiang tidak tersedia lahan yang cukup untuk memasang Treck Schoor, dengan menopang tiang utama menggunakan pipa besi atau tiang miring.",
+    "options": [
+      "Ketika tiang dipasang di tepi jurang yang sangat curam",
+      "Ketika pada bagian belakang tiang tidak tersedia lahan yang cukup untuk memasang Treck Schoor",
+      "Ketika tiang harus melewati persimpangan jalan raya yang lebar",
+      "Ketika kapasitas daya listrik melebihi batas 630 A"
+    ]
+  },
+  {
+    "id": "4c8vXaGB5Ue4I9xnESAk",
+    "question": "Berapa sudut kemiringan kawat schoor terhadap tanah yang dipasang pada konstruksi Treck Schoor?",
+    "correctAnswerIndex": 2,
+    "explanation": "Kawat schoor pada konstruksi Treck Schoor dipasang dengan sudut kemiringan terhadap tanah sebesar 60°.",
+    "options": [
+      "30°",
+      "45°",
+      "60°",
+      "90°"
+    ]
+  },
+  {
+    "id": "64y2R2zxG8eZmxrF97vh",
+    "question": "Berapakah nilai Kemampuan Hantar Arus (KHA) untuk kabel NYFGBY dengan penampang 4 × 70 mm²?",
+    "correctAnswerIndex": 2,
+    "explanation": "Kemampuan Hantar Arus (KHA) kabel NYFGBY 4 × 70 mm² adalah sebesar 228 A.",
+    "options": [
+      "128 A",
+      "185 A",
+      "228 A",
+      "275 A"
+    ]
+  },
+  {
+    "id": "65ROcPx0TsAzRpwm3zNv",
+    "question": "Berapakah kapasitas arus Lightning Arrester (LA) yang tepat untuk trafo dan jaringan pada SUTM?",
+    "correctAnswerIndex": 0,
+    "explanation": "Kapasitas arus arrester yang benar pada SUTM adalah 5 kA untuk proteksi trafo dan 10 kA untuk proteksi jaringan.",
+    "options": [
+      "5 kA untuk trafo dan 10 kA untuk jaringan",
+      "10 kA untuk trafo dan 5 kA untuk jaringan",
+      "5 kA untuk trafo dan 5 kA untuk jaringan",
+      "10 kA untuk trafo dan 20 kA untuk jaringan"
+    ]
+  },
+  {
+    "id": "7xDVFJVu4CLmxcREwUQQ",
+    "question": "Jika sebuah tiang listrik memiliki tinggi total 12 meter, berapa kedalaman minimal tiang tersebut harus ditanam di dalam tanah?",
+    "correctAnswerIndex": 1,
+    "explanation": "Dengan ketentuan minimal penanaman adalah 1/6 dari tinggi tiang, maka perhitungan kedalamannya adalah 1/6 x 12 meter = 2 meter.",
+    "options": [
+      "1 meter",
+      "2 meter",
+      "3 meter",
+      "4 meter"
+    ]
+  },
+  {
+    "id": "9621M9B9VmlZLfKH9j4b",
+    "question": "Apa keunggulan utama Directional Ground Fault Relay (DGR) dibandingkan Ground Fault Relay (GFR) biasa?",
+    "correctAnswerIndex": 2,
+    "explanation": "DGR (Directional Ground Fault Relay) membandingkan arah arus dan tegangan untuk mengetahui arah aliran gangguan, sehingga hanya memutus penyulang yang terganggu tanpa memadamkan jalur yang sehat.",
+    "options": [
+      "DGR mampu memutus arus lebih cepat tanpa membutuhkan koordinasi proteksi",
+      "DGR tidak memerlukan pembumian sistem",
+      "DGR dapat menganalisis arah aliran gangguan dengan membandingkan arah arus dan tegangan sehingga proteksi lebih selektif",
+      "DGR bekerja otomatis menaikkan tegangan ketika terjadi gangguan tanah"
+    ]
+  },
+  {
+    "id": "AeoOEPqRC5RY6BfYdI0F",
+    "question": "Berapa ukuran konduktor minimum yang digunakan pada konstruksi SUTR menurut modul?",
+    "correctAnswerIndex": 2,
+    "explanation": "Ukuran konduktor minimum yang digunakan pada SUTR adalah 3 × 70 + 1 × 50 mm².",
+    "options": [
+      "3 × 35 + 1 × 25 mm²",
+      "3 × 50 + 1 × 35 mm²",
+      "3 × 70 + 1 × 50 mm²",
+      "3 × 95 + 1 × 70 mm²"
+    ]
+  },
+  {
+    "id": "BemkAKOulhKzjULgaEJ9",
+    "question": "Berapakah jarak ruang bebas (Right of Way) minimal yang harus dijaga pada jaringan SUTM dari dahan pohon atau bangunan pada sisi kiri dan kanan kabel?",
+    "correctAnswerIndex": 2,
+    "explanation": "Pada jaringan SUTM, ruang bebas yang harus dijaga dari dahan pohon maupun bangunan pada sisi kiri dan kanan kabel adalah minimal 300 cm atau 3 meter.",
+    "options": [
+      "1,5 meter",
+      "2,5 meter",
+      "3 meter",
+      "5 meter"
+    ]
+  },
+  {
+    "id": "BpcuH5IV4MdZB5kbZGkF",
+    "question": "Berapakah spesifikasi tiang yang digunakan dalam konstruksi Jaringan Tegangan Rendah (JTR)?",
+    "correctAnswerIndex": 1,
+    "explanation": "Tiang JTR yang digunakan berupa tiang beton atau besi dengan spesifikasi 9 meter 200 daN.",
+    "options": [
+      "7 meter 100 daN",
+      "9 meter 200 daN",
+      "11 meter 350 daN",
+      "12 meter 500 daN"
+    ]
+  },
+  {
+    "id": "By1GRmthcz4l1whzAuyB",
+    "question": "Berapakah ukuran kedalaman dan lebar galian untuk pemasangan kabel SKTM sesuai standar materi?",
+    "correctAnswerIndex": 0,
+    "explanation": "Dalam pelaksanaannya, galian kabel SKTM memiliki kedalaman sekitar 80 cm dan lebar sekitar 40 cm, serta diberi pasir urug setebal 20 cm pada bagian dasar.",
+    "options": [
+      "Kedalaman sekitar 80 cm dan lebar sekitar 40 cm",
+      "Kedalaman sekitar 100 cm dan lebar sekitar 50 cm",
+      "Kedalaman sekitar 50 cm dan lebar sekitar 30 cm",
+      "Kedalaman sekitar 120 cm dan lebar sekitar 60 cm"
+    ]
+  },
+  {
+    "id": "CfmNivyGnmiJovR0Hx6Z",
+    "question": "Di kawasan manakah gardu beton umumnya dibangun dan digunakan?",
+    "correctAnswerIndex": 1,
+    "explanation": "Gardu beton umumnya digunakan di pusat kota atau kawasan metropolitan yang memiliki kepadatan penduduk serta kebutuhan energi listrik yang tinggi.",
+    "options": [
+      "Kawasan pedesaan dengan konsumsi daya rendah",
+      "Pusat kota atau metropolitan dengan kepadatan penduduk dan kebutuhan energi tinggi",
+      "Kawasan perkebunan terpencil yang membutuhkan distribusi satu fasa",
+      "Jalur transmisi antar pulau bertegangan ekstra tinggi"
+    ]
+  },
+  {
+    "id": "E4bM57DmU9WL8MutuC1X",
+    "question": "Berdasarkan spesifikasi sipil untuk Sambungan Tegangan Menengah (SLTM), berapa ketinggian minimal langit-langit gardu dan peninggian lantai dari jalan utama?",
+    "correctAnswerIndex": 1,
+    "explanation": "Spesifikasi sipil SLTM mensyaratkan tinggi langit-langit gardu minimal 3,2 meter dan peninggian lantai minimal 30 cm dari jalan utama guna mencegah banjir.",
+    "options": [
+      "Langit-langit minimal 3,0 meter dan peninggian lantai minimal 20 cm",
+      "Langit-langit minimal 3,2 meter dan peninggian lantai minimal 30 cm",
+      "Langit-langit minimal 3,5 meter dan peninggian lantai minimal 50 cm",
+      "Langit-langit minimal 2,8 meter dan peninggian lantai minimal 15 cm"
+    ]
+  },
+  {
+    "id": "F2ZdhQHDtJR2PBOK3Lsu",
+    "question": "Pemasangan Ground Steel Wire (GSW) pada SUTM dilakukan secara berkala setiap...",
+    "correctAnswerIndex": 1,
+    "explanation": "Ground Steel Wire (GSW) dipasang setiap 250 meter atau sekitar 5 tiang, dengan ground rod berdiameter 16 mm² dan panjang 2,5 meter.",
+    "options": [
+      "100 meter atau sekitar 2 tiang",
+      "250 meter atau sekitar 5 tiang",
+      "500 meter atau sekitar 10 tiang",
+      "35 meter untuk setiap tarikan"
+    ]
+  },
+  {
+    "id": "FNweCa2sTOKv62wFNznP",
+    "question": "Jalur penghubung antara jaringan PLN dengan Gardu atau Alat Pembatas dan Pengukur (APP) milik pelanggan yang berfungsi sebagai titik transaksi disebut...",
+    "correctAnswerIndex": 3,
+    "explanation": "Sambungan Listrik Tegangan Menengah (SLTM) merupakan jalur masuk penghubung jaringan PLN dengan Gardu atau APP pelanggan dan berfungsi sebagai titik transaksi atau penyambungan.",
+    "options": [
+      "SKUTM",
+      "SUTM",
+      "SKTM",
+      "SLTM"
+    ]
+  },
+  {
+    "id": "FTWsS39XrxAGsjrOig2r",
+    "question": "Manakah pernyataan yang paling tepat mengenai karakteristik gardu cantol?",
+    "correctAnswerIndex": 0,
+    "explanation": "Gardu cantol memiliki karakteristik menggunakan satu tiang, kapasitas transformator 25–100 kVA, memiliki 2 jurusan, dan menggunakan Cut Out (CO) sebagai pengaman TM.",
+    "options": [
+      "Menggunakan satu tiang, kapasitas 25–100 kVA, dan memiliki 2 jurusan",
+      "Menggunakan dua tiang, kapasitas 160–250 kVA, dan memiliki 4 jurusan",
+      "Berupa bangunan permanen dengan kapasitas di atas 250 kVA",
+      "Menggunakan HRC Fuse pada sisi tegangan menengah"
+    ]
+  },
+  {
+    "id": "G8QKW2ZBll1CnfGGY5g1",
+    "question": "Mengapa Saluran Kabel Udara Tegangan Menengah (SKUTM) sangat cocok diterapkan pada daerah yang memiliki banyak pepohonan?",
+    "correctAnswerIndex": 2,
+    "explanation": "SKUTM menggunakan kabel berisolasi penuh (seperti kabel berisolasi pilin atau MVTIC) yang memiliki isolasi baik, sehingga sangat sesuai untuk daerah rimbun pepohonan guna mengurangi gangguan akibat kontak dengan dahan atau lingkungan sekitar.",
+    "options": [
+      "Menggunakan kawat telanjang yang tahan terhadap gesekan dahan pohon",
+      "Kabel ditanam di dalam tanah sehingga terhindar dari dahan pohon",
+      "Menggunakan kabel berisolasi penuh sehingga mengurangi risiko gangguan akibat kontak lingkungan",
+      "Biaya pemasangan lebih murah dibandingkan saluran udara lainnya"
+    ]
+  },
+  {
+    "id": "GhvbiEpbbPCAsSwcq0g5",
+    "question": "Berapa ukuran lahan minimal dan tinggi langit-langit gardu yang wajib disediakan oleh pelanggan dengan daya 200 kVA s.d. 2.180 kVA?",
+    "correctAnswerIndex": 0,
+    "explanation": "Untuk daya 200 kVA s.d. 2.180 kVA, pelanggan wajib menyediakan lahan minimal 20 m² (5m x 4m) dengan tinggi langit-langit gardu minimal 3,2 meter.",
+    "options": [
+      "20 m² (5m x 4m) dengan tinggi langit-langit minimal 3,2 meter",
+      "25 m² (5m x 5m) dengan tinggi langit-langit minimal 3,0 meter",
+      "35 m² (5m x 7m) dengan tinggi langit-langit minimal 3,2 meter",
+      "35 m² (5m x 7m) dengan tinggi langit-langit minimal 4,0 meter"
+    ]
+  },
+  {
+    "id": "H6C95crJ4sjRL0CCAYcG",
+    "question": "Apa fungsi utama dari tiang bantu Kontramast (S-2)?",
+    "correctAnswerIndex": 1,
+    "explanation": "Kontramast (S-2) adalah tiang bantu yang dipasang dalam posisi tegak untuk membantu menarik kawat schoor apabila terdapat penghalang seperti jalan atau bangunan.",
+    "options": [
+      "Menopang trafo distribusi kapasitas besar",
+      "Membantu menarik kawat schoor apabila terdapat penghalang seperti jalan atau bangunan",
+      "Memutuskan aliran listrik secara otomatis saat terjadi hubung singkat",
+      "Mengontrol sistem SCADA/RTU dari jarak jauh"
+    ]
+  },
+  {
+    "id": "J7ckKUUA8Fl69WPGVAGR",
+    "question": "Apa definisi teknis resmi dari 'Susut Jaringan' pada sistem distribusi listrik?",
+    "correctAnswerIndex": 1,
+    "explanation": "Menurut dokumen teknis, definisi resmi susut jaringan adalah jumlah kWh yang dikirimkan ke jaringan distribusi dikurangi dengan kWh yang terjual ke pelanggan.",
+    "options": [
+      "Kerugian daya aktif akibat panas pada penghantar",
+      "Jumlah kWh yang dikirimkan ke jaringan distribusi dikurangi dengan kWh yang terjual ke pelanggan",
+      "Persentase penurunan tegangan dari gardu induk ke pelanggan",
+      "Total energi listrik yang hilang karena pencurian arus"
+    ]
+  },
+  {
+    "id": "JbAouysQ5c0SwLtLuJCx",
+    "question": "Pemasangan kabel SUTR tidak dianjurkan melintasi bentang sungai yang memiliki lebar lebih dari...",
+    "correctAnswerIndex": 2,
+    "explanation": "Pemasangan kabel SUTR tidak dianjurkan melintasi jalur kereta api atau sungai dengan lebar lebih dari 20 meter karena risiko keselamatan dan konstruksi yang tinggi.",
+    "options": [
+      "10 meter",
+      "15 meter",
+      "20 meter",
+      "25 meter"
+    ]
+  },
+  {
+    "id": "JunTDWLKw2MtwJuuhvjq",
+    "question": "Berapakah jarak aman vertikal minimal pemasangan kabel SUTR terhadap balkon rumah dari bagian dengan jangkauan tangan terjauh?",
+    "correctAnswerIndex": 2,
+    "explanation": "Jarak aman vertikal terhadap balkon rumah atau dahan dari bagian yang memiliki jangkauan tangan paling jauh minimal adalah 2,5 meter.",
+    "options": [
+      "1,5 meter",
+      "2,0 meter",
+      "2,5 meter",
+      "3,0 meter"
+    ]
+  },
+  {
+    "id": "KM809jc0FX8bkDarroSW",
+    "question": "Berapakah panjang kabel TIC (Twisted Insulated Cable) maksimal yang direncanakan untuk sambungan SLTR 1 Phasa?",
+    "correctAnswerIndex": 2,
+    "explanation": "Kabel TIC direncanakan rata-rata sepanjang 30 meter, dengan panjang maksimal 40 meter.",
+    "options": [
+      "30 meter",
+      "35 meter",
+      "40 meter",
+      "50 meter"
+    ]
+  },
+  {
+    "id": "KRWYUUMRTjBcwODIoTvA",
+    "question": "Berapa ukuran kawat baja GSW/Schoor yang digunakan pada konstruksi Treck Schoor untuk jaringan SUTM dan SUTR?",
+    "correctAnswerIndex": 0,
+    "explanation": "Untuk jaringan SUTM, kawat baja schoor yang digunakan berukuran 35 mm², sedangkan untuk SUTR berukuran 22 mm².",
+    "options": [
+      "35 mm² untuk SUTM dan 22 mm² untuk SUTR",
+      "22 mm² untuk SUTM dan 35 mm² untuk SUTR",
+      "50 mm² untuk SUTM dan 35 mm² untuk SUTR",
+      "70 mm² untuk SUTM dan 50 mm² untuk SUTR"
+    ]
+  },
+  {
+    "id": "KWllsYbHEyJtjl1OZDAM",
+    "question": "Jenis gangguan listrik apa yang secara spesifik dideteksi oleh OCR (Over Current Relay)?",
+    "correctAnswerIndex": 1,
+    "explanation": "OCR (Over Current Relay) berfungsi untuk mendeteksi gangguan hubungan singkat antar-fasa (misalnya fasa R dengan S, atau S dengan T) ketika arus beban melonjak melebihi batas aman (setting).",
+    "options": [
+      "Hubungan singkat fasa ke tanah",
+      "Hubungan singkat antar-fasa (misalnya fasa R dengan S)",
+      "Kenaikan tegangan lebih (overvoltage)",
+      "Penurunan frekuensi listrik secara mendadak"
+    ]
+  },
+  {
+    "id": "MCT7LKo5ZBM4xH2WwtOc",
+    "question": "Berapa batas maksimal andongan (lendutan kabel) pada jaringan tegangan rendah?",
+    "correctAnswerIndex": 1,
+    "explanation": "Andongan atau lendutan kabel pada JTR dibatasi maksimal 3% dari panjang gawang (span).",
+    "options": [
+      "1% dari panjang gawang",
+      "3% dari panjang gawang",
+      "5% dari panjang gawang",
+      "10% dari panjang gawang"
+    ]
+  },
+  {
+    "id": "NxtJUSNhACPRJBJps1Cl",
+    "question": "Berapakah ketinggian batas bawah pemasangan APP (Alat Pembatas dan Pengukur) pada SLTR 1 Phasa dari permukaan tanah/lantai?",
+    "correctAnswerIndex": 2,
+    "explanation": "Batas bawah APP untuk SLTR 1 Phasa dipasang tegak lurus setinggi ± 160 cm dari permukaan tanah/lantai agar mudah dibaca.",
+    "options": [
+      "± 140 cm",
+      "± 150 cm",
+      "± 160 cm",
+      "± 170 cm"
+    ]
+  },
+  {
+    "id": "OEW9DNqn8WjFiSIqlt1F",
+    "question": "Jenis saluran tegangan menengah yang menggunakan kawat telanjang seperti jenis AAAC dan dipasang menggantung pada tiang serta isolator adalah...",
+    "correctAnswerIndex": 1,
+    "explanation": "Saluran Udara Tegangan Menengah (SUTM) menggunakan kabel atau kawat telanjang seperti AAAC yang dipasang dan digantung di udara dengan bantuan tiang serta isolator.",
+    "options": [
+      "Saluran Kabel Tanah Tegangan Menengah (SKTM)",
+      "Saluran Udara Tegangan Menengah (SUTM)",
+      "Saluran Kabel Udara Tegangan Menengah (SKUTM)",
+      "Sambungan Listrik Tegangan Menengah (SLTM)"
+    ]
+  },
+  {
+    "id": "PwmlECOAhh9PXXeJDv3Y",
+    "question": "Berapakah kapasitas arrester yang digunakan pada trafo dan jaringan SUTM dengan rating tegangan 24 kV?",
+    "correctAnswerIndex": 2,
+    "explanation": "Arrester yang digunakan memiliki rating tegangan 24 kV dengan kapasitas 5 kA pada transformator (trafo) dan 10 kA pada jaringan.",
+    "options": [
+      "5 kA pada trafo dan 5 kA pada jaringan",
+      "10 kA pada trafo dan 5 kA pada jaringan",
+      "5 kA pada trafo dan 10 kA pada jaringan",
+      "10 kA pada trafo dan 10 kA pada jaringan"
+    ]
+  },
+  {
+    "id": "QlQ5Kcc5Bo7Q7xtP3Sej",
+    "question": "Sistem pengukuran apa yang digunakan untuk pelanggan SLTR 3 Phasa dengan daya 50 kVA s.d. 197 kVA?",
+    "correctAnswerIndex": 2,
+    "explanation": "Untuk daya 50 kVA s.d. 197 kVA digunakan sistem Pengukuran Tidak Langsung dengan bantuan CT (Current Transformer) Tegangan Rendah dan pembatas MCCB tipe fixed.",
+    "options": [
+      "Pengukuran Langsung dengan APP terintegrasi AMR",
+      "Pengukuran Langsung dengan MCCB tipe adjustable",
+      "Pengukuran Tidak Langsung menggunakan bantuan CT (Current Transformer) Tegangan Rendah",
+      "Pengukuran Tidak Langsung menggunakan trafo tegangan (PT) Tegangan Rendah"
+    ]
+  },
+  {
+    "id": "R4zdVy5ecDyb0AfikHRC",
+    "question": "Berapa batas daya pelanggan rumah tangga yang diupayakan menggunakan sambungan 3 Phasa demi menjaga keseimbangan beban trafo?",
+    "correctAnswerIndex": 2,
+    "explanation": "Agar beban trafo tetap seimbang, sambungan rumah tangga dengan daya di atas 7.700 VA diupayakan menggunakan sambungan 3 Phasa.",
+    "options": [
+      "Di atas 3.500 VA",
+      "Di atas 5.500 VA",
+      "Di atas 7.700 VA",
+      "Di atas 11.000 VA"
+    ]
+  },
+  {
+    "id": "RD9LfxLw7CmT4pBeVIli",
+    "question": "Mengapa penarikan kabel SKTM dilarang keras menggunakan mesin (winch) dan harus dilakukan secara manual?",
+    "correctAnswerIndex": 1,
+    "explanation": "Kabel tanah TM dilarang ditarik menggunakan mesin (winch) karena gaya tariknya dapat merusak struktur isolasi kabel, sehingga harus ditarik manual dengan bantuan rol kabel berjarak maksimal 5 meter.",
+    "options": [
+      "Karena mesin winch membutuhkan konsumsi daya yang terlalu besar di lapangan",
+      "Karena dapat menyebabkan kerusakan pada struktur isolasi kabel",
+      "Karena kecepatan tarikan mesin winch tidak dapat dikontrol",
+      "Karena rol kabel tidak kompatibel dengan tarikan mesin"
+    ]
+  },
+  {
+    "id": "RUfhsRoMaePgRm7OUFsc",
+    "question": "Berapa jumlah jurusan (group) pada sisi tegangan rendah yang dapat disediakan oleh gardu beton?",
+    "correctAnswerIndex": 2,
+    "explanation": "Pada sisi tegangan rendah, gardu beton memiliki minimal 4 jurusan dan dapat ditingkatkan hingga 8 jurusan, tergantung kapasitas transformator dan kebutuhan beban.",
+    "options": [
+      "1 hingga 2 jurusan",
+      "Tepat 2 jurusan",
+      "4 hingga 8 jurusan",
+      "10 hingga 12 jurusan"
+    ]
+  },
+  {
+    "id": "SQQ7V0YKe1m5hSWamWOk",
+    "question": "Berapakah jarak vertikal kabel SUTR minimal dari permukaan aspal jika melintasi jalan raya utama?",
+    "correctAnswerIndex": 2,
+    "explanation": "Untuk jaringan SUTR yang melintasi jalan raya utama, jarak vertikal kabel dari permukaan aspal ditetapkan minimal 6 meter.",
+    "options": [
+      "4 meter",
+      "5 meter",
+      "6 meter",
+      "7 meter"
+    ]
+  },
+  {
+    "id": "TgxsMAPpOwejaHwruLMl",
+    "question": "Berapa jumlah feeder maksimal yang dapat dilayani oleh satu konstruksi tiang utama pada SKUTM (MVTIC)?",
+    "correctAnswerIndex": 2,
+    "explanation": "Pada jaringan SKUTM/MVTIC, satu konstruksi tiang utama dapat melayani maksimal 4 feeder.",
+    "options": [
+      "2 feeder",
+      "3 feeder",
+      "4 feeder",
+      "6 feeder"
+    ]
+  },
+  {
+    "id": "ThbA16XmO3MlPtzq4uow",
+    "question": "Berapa kedalaman penanaman kabel SKTR di bawah permukaan tanah yang dianjurkan?",
+    "correctAnswerIndex": 2,
+    "explanation": "Kabel tanah pada SKTR ditanam pada kedalaman sekitar 70 cm di bawah permukaan tanah.",
+    "options": [
+      "Sekitar 30 cm",
+      "Sekitar 50 cm",
+      "Sekitar 70 cm",
+      "Sekitar 100 cm"
+    ]
+  },
+  {
+    "id": "V0Ojf8nrzqAdil4VRdv6",
+    "question": "Berapakah rentang kapasitas transformator yang umumnya digunakan pada gardu portal?",
+    "correctAnswerIndex": 1,
+    "explanation": "Berdasarkan teks, gardu portal digunakan untuk transformator berkapasitas 160–250 kVA dengan dua tiang dan 4 jurusan.",
+    "options": [
+      "25–100 kVA",
+      "160–250 kVA",
+      "315–630 kVA",
+      "Di atas 1000 kVA"
+    ]
+  },
+  {
+    "id": "Valqp4xSP3BLF3I3WBsR",
+    "question": "Karakteristik utama dari Saluran Kabel Tanah Tegangan Menengah (SKTM) menurut teks adalah...",
+    "correctAnswerIndex": 0,
+    "explanation": "SKTM dipasang atau ditanam di bawah permukaan tanah dengan kabel berpelindung mekanis dan isolasi XLPE, serta dilengkapi perlindungan fisik seperti lapisan pasir dan batu bata.",
+    "options": [
+      "Dipasang di bawah tanah dan dilengkapi pelindung mekanis seperti lapisan pasir dan batu bata",
+      "Menggunakan kawat telanjang berisolasi pilin yang ditanam dalam tanah",
+      "Dipasang di tiang menggunakan kabel tanah berisolasi AAAC",
+      "Berfungsi sebagai titik transaksi langsung antara PLN dan pelanggan di udara"
+    ]
+  },
+  {
+    "id": "Vb9RmQDRHidsuaC9PnPt",
+    "question": "Berdasarkan teks, apa fungsi utama dari konstruksi schoor pada sistem distribusi tenaga listrik?",
+    "correctAnswerIndex": 1,
+    "explanation": "Konstruksi schoor berfungsi untuk menjaga kestabilan tiang terhadap beban mekanis, sedangkan LBS dan recloser berfungsi meningkatkan keandalan sistem.",
+    "options": [
+      "Mengurangi rugi-rugi daya pada saluran",
+      "Menjaga kestabilan tiang terhadap beban mekanis",
+      "Melokalisasi bagian jaringan yang mengalami gangguan",
+      "Menjaga jarak aman antara manusia dan konduktor bertegangan"
+    ]
+  },
+  {
+    "id": "Vi8IH7kToUOWhhT4cPNV",
+    "question": "Berapakah spesifikasi minimal tiang atap untuk Sambungan Rumah (TR)?",
+    "correctAnswerIndex": 0,
+    "explanation": "Spesifikasi tiang atap adalah panjang minimal 1,5 meter dan menggunakan pipa besi berdiameter 1,5 inch.",
+    "options": [
+      "Panjang minimal 1,5 meter dengan pipa besi diameter 1,5 inch",
+      "Panjang minimal 2,0 meter dengan pipa besi diameter 2,0 inch",
+      "Panjang minimal 1,2 meter dengan pipa PVC diameter 1,5 inch",
+      "Panjang minimal 1,8 meter dengan pipa galvanis diameter 1,0 inch"
+    ]
+  },
+  {
+    "id": "Vu6eobJOTluhruw8XXpK",
+    "question": "Apa definisi dari susut (losses) jaringan distribusi menurut materi?",
+    "correctAnswerIndex": 1,
+    "explanation": "Susut jaringan distribusi didefinisikan sebagai selisih antara energi (kWh) yang dikirim ke jaringan distribusi dengan kWh yang terjual ke pelanggan.",
+    "options": [
+      "Selisih antara biaya investasi konstruksi dengan biaya pemeliharaan jaringan",
+      "Selisih antara energi (kWh) yang dikirim ke jaringan distribusi dengan kWh yang terjual ke pelanggan",
+      "Penurunan indeks keandalan SAIDI dan SAIFI dalam periode satu tahun",
+      "Total penurunan tegangan listrik dari gardu distribusi hingga APP pelanggan"
+    ]
+  },
+  {
+    "id": "WphhQi5NZd78oHWTzhgC",
+    "question": "Pada daerah perkotaan atau daerah dengan pertumbuhan beban yang cepat, ukuran penghantar dan spesifikasi tiang beton yang digunakan untuk SUTM adalah...",
+    "correctAnswerIndex": 1,
+    "explanation": "Untuk daerah perkotaan atau pertumbuhan beban cepat, digunakan penghantar berukuran 150 mm² dengan tiang beton berukuran 13 meter 350 daN atau 14 meter 350 daN.",
+    "options": [
+      "Penghantar 70 mm² dengan tiang beton 12 meter 200 daN",
+      "Penghantar 150 mm² dengan tiang beton 13 meter 350 daN atau 14 meter 350 daN",
+      "Penghantar 240 mm² dengan tiang beton 12 meter 350 daN",
+      "Penghantar 70 mm² dengan tiang beton 13 meter 350 daN"
+    ]
+  },
+  {
+    "id": "ZJYOqVuwXdNLFpDDF34z",
+    "question": "Berapakah rentang daya untuk SLTM Kategori I?",
+    "correctAnswerIndex": 1,
+    "explanation": "Berdasarkan klasifikasi daya SLTM, Kategori I mencakup daya 200 kVA sampai dengan 690 kVA.",
+    "options": [
+      "100 kVA sampai dengan 500 kVA",
+      "200 kVA sampai dengan 690 kVA",
+      "691 kVA sampai dengan 2.000 kVA",
+      "2.001 kVA sampai dengan 9.900 kVA"
+    ]
+  },
+  {
+    "id": "aFoFQoIawGshXln1i5ya",
+    "question": "Jenis pengaman yang digunakan pada sisi tegangan menengah (TM) untuk gardu beton adalah...",
+    "correctAnswerIndex": 1,
+    "explanation": "Pengaman pada sisi tegangan menengah untuk gardu beton menggunakan HRC (High Rupture Capacity) Fuse, berbeda dengan gardu cantol dan portal yang menggunakan Cut Out (CO).",
+    "options": [
+      "Sekring Cut Out (CO)",
+      "HRC (High Rupture Capacity) Fuse",
+      "Miniature Circuit Breaker (MCB)",
+      "Moulded Case Circuit Breaker (MCCB)"
+    ]
+  },
+  {
+    "id": "axi3WcchVb3x3dXDZ2I9",
+    "question": "Berapakah ketebalan pasir alas kabel yang digunakan untuk Saluran Kabel Tegangan Menengah (SKTM)?",
+    "correctAnswerIndex": 2,
+    "explanation": "Ketebalan lapisan pasir untuk alas kabel tanah Tegangan Menengah (SKTM) adalah ± 20 cm.",
+    "options": [
+      "± 5 cm",
+      "± 10 cm",
+      "± 20 cm",
+      "± 50 cm"
+    ]
+  },
+  {
+    "id": "cVebOcvs7ZP2EYwUl5Il",
+    "question": "Mengapa Lightning Arrester (LA) pada SUTM tidak dipasang di setiap tiang jaringan?",
+    "correctAnswerIndex": 1,
+    "explanation": "LA tidak dipasang di setiap tiang karena pertimbangan biaya yang terlalu mahal dan tidak efisien, melainkan ditempatkan di ujung jaringan, percabangan, trafo, switching, dan titik perubahan impedansi.",
+    "options": [
+      "Karena dapat menyebabkan korsleting pada tiang",
+      "Karena terlalu mahal dan tidak efisien",
+      "Karena menurunkan kapasitas hantar arus kabel",
+      "Karena hanya dibutuhkan pada sistem tegangan ekstra tinggi"
+    ]
+  },
+  {
+    "id": "dNEXtqu1P9RF2mx4KCbD",
+    "question": "Tipe pondasi yang digunakan untuk menopang konstruksi gardu portal adalah...",
+    "correctAnswerIndex": 1,
+    "explanation": "Struktur dua tiang pada gardu portal ditopang menggunakan pondasi tipe M.24 A, sedangkan pondasi tipe A digunakan pada gardu cantol.",
+    "options": [
+      "Pondasi tipe A",
+      "Pondasi tipe M.24 A",
+      "Pondasi tipe B",
+      "Pondasi tipe M.12 A"
+    ]
+  },
+  {
+    "id": "eCBmJxnu3IUiiQVBwn6P",
+    "question": "Berapakah kapasitas transformator yang umumnya digunakan pada gardu cantol (gardu 1 tiang)?",
+    "correctAnswerIndex": 1,
+    "explanation": "Gardu cantol atau gardu 1 tiang digunakan untuk transformator dengan kapasitas 25 kVA sampai 100 kVA.",
+    "options": [
+      "10 kVA sampai 20 kVA",
+      "25 kVA sampai 100 kVA",
+      "160 kVA sampai 250 kVA",
+      "300 kVA sampai 500 kVA"
+    ]
+  },
+  {
+    "id": "fgdbMqYkR0Hci3OsTEB0",
+    "question": "Berapa ukuran minimal kedalaman penanaman tiang listrik ke dalam tanah?",
+    "correctAnswerIndex": 2,
+    "explanation": "Berdasarkan materi yang diberikan, minimal penanaman tiang listrik adalah 1/6 (satu per enam) dari tinggi tiang yang berada di tanah.",
+    "options": [
+      "1/4 dari tinggi tiang",
+      "1/5 dari tinggi tiang",
+      "1/6 dari tinggi tiang",
+      "1/8 dari tinggi tiang"
+    ]
+  },
+  {
+    "id": "glaRlCcPPZWNuf6KajAC",
+    "question": "Pelanggan SLTR 3 Phasa dengan daya berapakah yang wajib dilengkapi dengan fasilitas AMR (Automatic Meter Reading)?",
+    "correctAnswerIndex": 1,
+    "explanation": "Khusus pelanggan 3 Phasa dengan daya 23 kVA s.d. 41,5 kVA wajib dilengkapi fasilitas AMR (Automatic Meter Reading).",
+    "options": [
+      "6,6 kVA s.d. 20 kVA",
+      "23 kVA s.d. 41,5 kVA",
+      "50 kVA s.d. 100 kVA",
+      "Semua daya di atas 6,6 kVA"
+    ]
+  },
+  {
+    "id": "h3rCubUWmUjmBYJqMNB5",
+    "question": "Apa fungsi utama dari gardu distribusi dalam sistem tenaga listrik?",
+    "correctAnswerIndex": 0,
+    "explanation": "Berdasarkan teks, gardu distribusi berfungsi menurunkan tegangan dari jaringan tegangan menengah (TM) menjadi tegangan rendah (TR) sebelum disalurkan kepada pelanggan.",
+    "options": [
+      "Menurunkan tegangan dari jaringan tegangan menengah (TM) menjadi tegangan rendah (TR)",
+      "Menaikkan tegangan dari jaringan tegangan rendah (TR) menjadi tegangan menengah (TM)",
+      "Menyimpan cadangan daya listrik sebelum disalurkan ke pelanggan",
+      "Mengubah arus bolak-balik (AC) menjadi arus searah (DC)"
+    ]
+  },
+  {
+    "id": "hSQLM1RqmcpDWBqQygu9",
+    "question": "Untuk menghindari tekukan yang terlalu tajam pada penarikan kabel SKTM, radius belokan kabel harus dijaga minimal sebesar...",
+    "correctAnswerIndex": 3,
+    "explanation": "Radius belokan kabel SKTM harus dijaga minimal 20 kali diameter luar kabel agar tidak mengalami tekukan tajam dan struktur kabel tetap terlindungi.",
+    "options": [
+      "5 kali diameter luar kabel",
+      "10 kali diameter luar kabel",
+      "15 kali diameter luar kabel",
+      "20 kali diameter luar kabel"
+    ]
+  },
+  {
+    "id": "j9a7OPdPjET3HhbwyZH4",
+    "question": "Pada sistem Saluran Kabel Tegangan Rendah (SKTR), kabel jenis apakah yang digunakan sebagai kabel tanah berpelindung mekanis?",
+    "correctAnswerIndex": 2,
+    "explanation": "Kabel yang digunakan untuk SKTR adalah kabel tanah berpelindung mekanis jenis NYFGBY.",
+    "options": [
+      "NYM",
+      "NYAF",
+      "NYFGBY",
+      "N2XSY"
+    ]
+  },
+  {
+    "id": "jWQyKPAR1VwRMFdRPfs8",
+    "question": "Peralatan pengaman yang digunakan pada sisi tegangan menengah (TM) pada gardu cantol adalah...",
+    "correctAnswerIndex": 2,
+    "explanation": "Pada sisi tegangan menengah gardu cantol, pengaman yang digunakan adalah sekring Cut Out (CO), sedangkan pada sisi tegangan rendah digunakan NH Fuse atau MCCB.",
+    "options": [
+      "NH Fuse",
+      "MCCB",
+      "Sekring Cut Out (CO)",
+      "Relay Proteksi"
+    ]
+  },
+  {
+    "id": "jjWofw93y6GmDbdsFScU",
+    "question": "Bagaimana cara kerja GFR (Ground Fault Relay) dalam mendeteksi gangguan?",
+    "correctAnswerIndex": 0,
+    "explanation": "Dalam kondisi normal, jumlah arus yang kembali melalui titik netral adalah nol (seimbang). Jika ada kebocoran arus ke tanah, keseimbangan ini hilang dan GFR akan mendeteksi arus sisa (arus gangguan tanah) tersebut untuk mematikan sistem.",
+    "options": [
+      "Mendeteksi arus sisa akibat hilangnya keseimbangan arus yang bocor ke tanah",
+      "Mengukur lonjakan suhu pada inti transformator",
+      "Menghitung penurunan tegangan antar-fasa secara kontinu",
+      "Memantau arah aliran daya aktif pada kabel transmisi"
+    ]
+  },
+  {
+    "id": "kokr0G6mXoBQaaSlw217",
+    "question": "Jika sambungan SLTR 1 Phasa menggunakan tiang atap, berapakah panjang minimal tiang dan bagian yang berada di bawah atap?",
+    "correctAnswerIndex": 0,
+    "explanation": "Panjang tiang atap minimal adalah 1,5 meter (dengan 50 cm berada di bawah atap) menggunakan pipa besi berdiameter 1,5 inch.",
+    "options": [
+      "Panjang minimal 1,5 meter dengan 50 cm di bawah atap",
+      "Panjang minimal 2,0 meter dengan 50 cm di bawah atap",
+      "Panjang minimal 1,5 meter dengan 30 cm di bawah atap",
+      "Panjang minimal 2,5 meter dengan 100 cm di bawah atap"
+    ]
+  },
+  {
+    "id": "l4QKgl96bsoWPC2wJcve",
+    "question": "Untuk menjaga keseimbangan beban trafo, pelanggan dengan daya berapa yang diupayakan menggunakan sambungan 3 Phasa?",
+    "correctAnswerIndex": 3,
+    "explanation": "Untuk menjaga keseimbangan beban trafo, pelanggan dengan daya di atas 7.700 VA diupayakan menggunakan sambungan 3 Phasa.",
+    "options": [
+      "Di atas 3.500 VA",
+      "Di atas 5.500 VA",
+      "Di atas 6.600 VA",
+      "Di atas 7.700 VA"
+    ]
+  },
+  {
+    "id": "lq0VnFYADRmE21bGbsM1",
+    "question": "Jenis kabel yang digunakan pada konstruksi Saluran Udara Tegangan Rendah (SUTR) di wilayah Papua adalah...",
+    "correctAnswerIndex": 1,
+    "explanation": "Berdasarkan materi, di wilayah Papua SUTR menggunakan kabel pilin udara berisolasi atau Twisted Insulated Cable (TIC).",
+    "options": [
+      "NYA (Kabel berinti temaga tunggal)",
+      "Twisted Insulated Cable (TIC)",
+      "ACSR (Aluminium Conductor Steel Reinforced)",
+      "NYY (Kabel fleksibel luar)"
+    ]
+  },
+  {
+    "id": "mdiWBOv9GAuXvvwApmDw",
+    "question": "Selain Over Current Relay (OCR), relai proteksi apa yang wajib diaktifkan pada instalasi SLTM untuk mengamankan gangguan tanah?",
+    "correctAnswerIndex": 1,
+    "explanation": "Selain OCR, sistem wajib mengaktifkan relai GFR (Ground Fault Relay) atau DGR (Directional Ground Fault Relay) untuk mengamankan instalasi jika terjadi gangguan tanah.",
+    "options": [
+      "Under Voltage Relay (UVR)",
+      "Ground Fault Relay (GFR) atau Directional Ground Fault Relay (DGR)",
+      "Thermal Overload Relay (TOR)",
+      "Reverse Power Relay (RPR)"
+    ]
+  },
+  {
+    "id": "o0ieMuVoaWcbJ9KvPGg9",
+    "question": "Kondisi apa yang mengharuskan penggunaan konstruksi dudukan dua tiang meskipun kapasitas transformator sesuai untuk gardu cantol?",
+    "correctAnswerIndex": 1,
+    "explanation": "Apabila berat transformator melebihi 1.000 kg, transformator tidak diperbolehkan dipasang pada satu tiang dan harus menggunakan konstruksi dudukan dengan dua tiang agar lebih kuat dan aman.",
+    "options": [
+      "Tinggi tiang melebihi 15 meter",
+      "Berat transformator melebihi 1.000 kg",
+      "Kekuatan tiang kurang dari 500 daN",
+      "Transformator memiliki lebih dari 2 jurusan pengeluaran"
+    ]
+  },
+  {
+    "id": "oUSK43AdO9X5TJYaLnwa",
+    "question": "Berapakah sistem tegangan yang digunakan pada Sambungan Tegangan Menengah (SLTM)?",
+    "correctAnswerIndex": 2,
+    "explanation": "Sambungan Tegangan Menengah (SLTM) digunakan untuk melayani pelanggan dengan sistem tegangan menengah 20 kV.",
+    "options": [
+      "220 V",
+      "380 V",
+      "20 kV",
+      "150 kV"
+    ]
+  },
+  {
+    "id": "qgYsaduKhUKzKU6kVr13",
+    "question": "Apa spesifikasi meter energi yang wajib digunakan pada seluruh kapasitas SLTM?",
+    "correctAnswerIndex": 2,
+    "explanation": "Seluruh kapasitas SLTM wajib menggunakan meter elektronik 3 phasa kelas 0,5s yang dilengkapi dengan fasilitas AMR (Automatic Meter Reading).",
+    "options": [
+      "Meter elektromekanik 1 phasa kelas 1.0",
+      "Meter elektromekanik 3 phasa kelas 0.5s",
+      "Meter elektronik 3 phasa kelas 0,5s yang dilengkapi AMR",
+      "Meter elektronik 3 phasa kelas 0,2s tanpa fasilitas AMR"
+    ]
+  },
+  {
+    "id": "tGk7bITNt2IYxFdCDeDt",
+    "question": "Berapakah batas lendutan atau andongan maksimal yang diizinkan untuk Saluran Udara Tegangan Rendah (SUTR)?",
+    "correctAnswerIndex": 2,
+    "explanation": "Lendutan/andongan maksimal untuk SUTR adalah 3%, sedangkan nilai 2% merupakan batas maksimal untuk SUTM yang memakai kawat AAAC-S.",
+    "options": [
+      "1%",
+      "2%",
+      "3%",
+      "5%"
+    ]
+  },
+  {
+    "id": "uahCfPRe1uDTaUMfMHv3",
+    "question": "Berapakah ukuran balok beton atau beton blok yang menjadi tumpuan bawah pada penyangga Druck Schoor?",
+    "correctAnswerIndex": 2,
+    "explanation": "Bagian bawah penyangga Druck Schoor bertumpu pada balok beton atau beton blok berukuran 400 × 400 × 100 mm.",
+    "options": [
+      "200 × 200 × 50 mm",
+      "300 × 300 × 100 mm",
+      "400 × 400 × 100 mm",
+      "500 × 500 × 150 mm"
+    ]
+  },
+  {
+    "id": "wQgubQKkUQAUPwx9BmfE",
+    "question": "Apa fungsi utama relai proteksi seperti OCR, GFR, dan DGR dalam sistem kelistrikan?",
+    "correctAnswerIndex": 1,
+    "explanation": "Relai proteksi bertugas mendeteksi gangguan listrik (seperti korsleting atau kebocoran arus) lalu memerintahkan PMT (Pemutus Tenaga / Circuit Breaker) untuk mematikan aliran listrik demi mencegah kerusakan fatal pada peralatan.",
+    "options": [
+      "Meningkatkan kapasitas daya listrik pada transformator",
+      "Mendeteksi gangguan listrik dan memerintahkan PMT untuk memutus aliran listrik",
+      "Mengubah arus bolak-balik (AC) menjadi arus searah (DC)",
+      "Mengukur total pemakaian energi listrik oleh konsumen"
+    ]
+  },
+  {
+    "id": "x9BJ4qKZbZEkAGGNcBpq",
+    "question": "Kotak APP Type VI digunakan khusus untuk jenis meter apa?",
+    "correctAnswerIndex": 1,
+    "explanation": "Kotak APP Type VI diperuntukkan bagi meter elektromekanis tarif ganda, sedangkan Type III digunakan untuk meter elektronik.",
+    "options": [
+      "Meter elektronik tarif tunggal",
+      "Meter elektromekanis tarif ganda",
+      "Meter elektronik tarif ganda dengan sistem AMR",
+      "Meter digital prabayar 3 Phasa"
+    ]
+  },
+  {
+    "id": "xr82vN871YASz2pPRjQL",
+    "question": "Berapa jumlah jurusan atau group pengeluaran pada sisi tegangan rendah pada gardu portal?",
+    "correctAnswerIndex": 3,
+    "explanation": "Pada sisi tegangan rendah, gardu portal (gardu 2 tiang) memiliki 4 jurusan atau group pengeluaran.",
+    "options": [
+      "1 jurusan",
+      "2 jurusan",
+      "3 jurusan",
+      "4 jurusan"
+    ]
+  },
+  {
+    "id": "yCDVukh4RkTK9cC1Ajnu",
+    "question": "Berapakah batas maksimal andongan yang diizinkan untuk kawat penghantar jenis AAAC pada konstruksi SUTM?",
+    "correctAnswerIndex": 0,
+    "explanation": "Berdasarkan teks materi, batas maksimal andongan untuk kawat AAAC adalah 1,5%, sedangkan untuk AAAC-S adalah 2,0%.",
+    "options": [
+      "1,5%",
+      "2,0%",
+      "3,0%",
+      "3,5%"
+    ]
+  },
+  {
+    "id": "yyefFF3K1r2lsXTzmAvP",
+    "question": "Berapakah aturan radius lengkungan belokan minimal saat memasang kabel tanah Tegangan Menengah (SKTM) 20 kV?",
+    "correctAnswerIndex": 3,
+    "explanation": "Radius belokan minimal untuk kabel SKTM adalah 20 kali diameter luar kabel agar lapisan isolasi di dalam kabel tidak retak/sobek yang berisiko memicu ledakan.",
+    "options": [
+      "5 kali diameter luar kabel",
+      "10 kali diameter luar kabel",
+      "15 kali diameter luar kabel",
+      "20 kali diameter luar kabel"
+    ]
+  },
+  {
+    "id": "zGQLx35r9PB6ve3hW6qE",
+    "question": "Keunggulan utama DGR (Directional Ground Fault Relay) dibandingkan GFR biasa pada jaringan kompleks atau kabel bawah tanah adalah...",
+    "correctAnswerIndex": 2,
+    "explanation": "DGR dilengkapi sensor arah aliran gangguan (menggunakan sensor tegangan dari PT dan arus) untuk menganalisis arah gangguan, sehingga pada jaringan kompleks penyulang yang sehat tidak ikut padam akibat arus balik kapasitif (salah trip).",
+    "options": [
+      "Dapat bekerja tanpa memerlukan bantuan PMT (Pemutus Tenaga)",
+      "Mampu menstabilkan frekuensi dan tegangan saat terjadi gangguan",
+      "Dilengkapi sensor arah gangguan sehingga penyulang yang sehat tidak ikut padam (salah trip)",
+      "Hanya membutuhkan sensor arus tanpa memerlukan trafo tegangan (PT)"
+    ]
+  }
+]

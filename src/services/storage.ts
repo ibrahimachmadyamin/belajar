@@ -18,9 +18,9 @@ export const requestFolderPermission = async (): Promise<string | null> => {
       return permissions.directoryUri;
     }
     return null;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error requesting permission:", error);
-    return null;
+    throw new Error(error.message || "Gagal membuka sistem file Android.");
   }
 };
 

@@ -30,12 +30,16 @@ export default function BankSoal() {
   };
 
   const handleSelectFolder = async () => {
-    const uri = await requestFolderPermission();
-    if (uri) {
-      Alert.alert("Sukses", "Folder penyimpanan berhasil diatur.");
-      loadData();
-    } else {
-      Alert.alert("Dibatalkan", "Anda belum memilih folder penyimpanan.");
+    try {
+      const uri = await requestFolderPermission();
+      if (uri) {
+        Alert.alert("Sukses", "Folder penyimpanan berhasil diatur.");
+        loadData();
+      } else {
+        Alert.alert("Dibatalkan", "Akses ditolak atau Anda belum memilih folder penyimpanan.");
+      }
+    } catch (error: any) {
+      Alert.alert("Error System", error.message || "Terjadi kesalahan sistem.");
     }
   };
 
