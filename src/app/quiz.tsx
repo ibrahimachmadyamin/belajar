@@ -22,9 +22,20 @@ export default function Quiz() {
     try {
       const loadedQuestions = await getLocalQuestions();
       
-      // Ambil maksimal 50 soal secara acak untuk sesi kuis ini
-      // Di aplikasi nyata, kita bisa tambahkan fitur pagination atau limit.
-      const shuffled = loadedQuestions.sort(() => 0.5 - Math.random());
+      // Acak urutan pertanyaan dan juga urutan opsi jawaban (A, B, C, D)
+      const shuffledQuestions = loadedQuestions.map(q => {
+        const correctAnswerString = q.options[q.correctAnswerIndex];
+        const shuffledOptions = [...q.options].sort(() => 0.5 - Math.random());
+        const newCorrectIndex = shuffledOptions.indexOf(correctAnswerString);
+        
+        return {
+          ...q,
+          options: shuffledOptions,
+          correctAnswerIndex: newCorrectIndex !== -1 ? newCorrectIndex : q.correctAnswerIndex
+        };
+      });
+      
+      const shuffled = shuffledQuestions.sort(() => 0.5 - Math.random());
       setQuestions(shuffled.slice(0, 50));
     } catch (error) {
       console.error("Gagal mengambil soal:", error);

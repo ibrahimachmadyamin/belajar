@@ -11,7 +11,33 @@ export interface QuizQuestion {
   explanation: string;
 }
 
-export async function generateQuestionsFromText(text: string): Promise<QuizQuestion[]> {
+export interface AIModel {
+  name: string;
+  displayName: string;
+}
+
+export async function getAvailableModels(): Promise<AIModel[]> {
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    const data = await response.json();
+    
+    if (data.models) {
+      // Hanya ambil model yang relevan untuk teks (gemini & flash)
+      return data.models
+        .filter((m: any) => m.name.includes("gemini") && m.name.includes("flash") && m.supportedGenerationMethods.includes("generateContent"))
+        .map((m: any) => ({
+          name: m.name.replace("models/", ""),
+          displayName: m.displayName
+        }));
+    }
+    return [];
+  } catch (error) {
+    console.error("Gagal mengambil daftar model:", error);
+    return [];
+  }
+}
+
+export async function generateQuestionsFromText(text: string, modelName: string = "gemini-2.5-flash"): Promise<QuizQuestion[]> {
   if (!apiKey || apiKey === "API_KEY_PLACEHOLDER") {
     throw new Error("API Key Gemini belum dikonfigurasi.");
   }
@@ -37,10 +63,10 @@ export async function generateQuestionsFromText(text: string): Promise<QuizQuest
     }
   };
 
-  // Menggunakan model stabil (gemini-2.5-flash) yang memiliki kuota gratis besar
+  // Menggunakan model pilihan pengguna (atau default jika tidak ada)
   const model = genAI.getGenerativeModel(
     {
-      model: "gemini-2.5-flash",
+      model: modelName,
       generationConfig: {
         temperature: 0.2, // Rendah agar lebih deterministik
         responseMimeType: "application/json",

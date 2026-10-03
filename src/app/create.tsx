@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   View, 
   Text, 
@@ -9,17 +9,53 @@ import {
   KeyboardAvoidingView, 
   Platform,
   Alert,
-  ScrollView
+  ScrollView,
+  Modal,
+  FlatList
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { generateQuestionsFromText } from "../services/ai";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { generateQuestionsFromText, getAvailableModels, AIModel } from "../services/ai";
 import { saveQuestionsLocally } from "../services/storage";
+
+const MODEL_PREF_KEY = "@selected_ai_model";
 
 export default function CreateQuiz() {
   const [material, setMaterial] = useState("");
   const [loading, setLoading] = useState(false);
+  const [models, setModels] = useState<AIModel[]>([]);
+  const [selectedModel, setSelectedModel] = useState<string>("gemini-2.5-flash");
+  const [showModelPicker, setShowModelPicker] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    loadModels();
+  }, []);
+
+  const loadModels = async () => {
+    try {
+      // Muat preferensi sebelumnya
+      const savedModel = await AsyncStorage.getItem(MODEL_PREF_KEY);
+      if (savedModel) {
+        setSelectedModel(savedModel);
+      }
+      
+      // Fetch model dari API
+      const availableModels = await getAvailableModels();
+      if (availableModels.length > 0) {
+        setModels(availableModels);
+      }
+    } catch (e) {
+      console.warn("Gagal memuat daftar model");
+    }
+  };
+
+  const selectModel = async (modelName: string) => {
+    setSelectedModel(modelName);
+    setShowModelPicker(false);
+    await AsyncStorage.setItem(MODEL_PREF_KEY, modelName);
+  };
 
   const handleGenerate = async () => {
     if (material.trim().length < 10) {
@@ -29,14 +65,14 @@ export default function CreateQuiz() {
 
     setLoading(true);
     try {
-      // 1. Generate dari AI
-      const questions = await generateQuestionsFromText(material);
+      // 1. Generate dari AI dengan model pilihan
+      const questions = await generateQuestionsFromText(material, selectedModel);
       
       if (!questions || questions.length === 0) {
         throw new Error("AI tidak mengembalikan soal.");
       }
 
-      // 2. Simpan ke Local Storage (AsyncStorage)
+      // 2. Simpan ke Local Storage (AsyncStorage/SAF)
       const successCount = await saveQuestionsLocally(questions);
 
       Alert.alert(
@@ -47,7 +83,7 @@ export default function CreateQuiz() {
       
     } catch (error: any) {
       console.error(error);
-      Alert.alert("Terjadi Kesalahan", error.message || "Gagal membuat soal. Pastikan API Key dan Firebase sudah disetting.");
+      Alert.alert("Terjadi Kesalahan", error.message || "Gagal membuat soal. Pastikan pengaturan sudah benar.");
     } finally {
       setLoading(false);
     }
@@ -65,6 +101,22 @@ export default function CreateQuiz() {
             Paste artikel, catatan pelajaran, atau bacaan apa pun di sini. AI akan menganalisisnya dan membuatkan soal pilihan ganda.
           </Text>
         </View>
+
+        {/* Model Selector Button */}
+        <TouchableOpacity 
+          style={styles.modelSelector} 
+          onPress={() => setShowModelPicker(true)}
+          activeOpacity={0.7}
+        >
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Ionicons name="hardware-chip-outline" size={20} color="#4ECDC4" style={{marginRight: 10}} />
+            <View>
+              <Text style={styles.modelSelectorLabel}>Model AI (Ketuk untuk ubah)</Text>
+              <Text style={styles.modelSelectorValue}>{selectedModel}</Text>
+            </View>
+          </View>
+          <Ionicons name="chevron-down" size={20} color="#8F90A6" />
+        </TouchableOpacity>
 
         <View style={styles.inputContainer}>
           <TextInput
@@ -98,10 +150,46 @@ export default function CreateQuiz() {
         
         {loading && (
           <Text style={styles.loadingText}>
-            AI sedang berpikir merangkai soal untuk Anda...
+            AI ({selectedModel}) sedang berpikir merangkai soal...
           </Text>
         )}
       </ScrollView>
+
+      {/* Model Picker Modal */}
+      <Modal visible={showModelPicker} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Pilih Model AI</Text>
+            <Text style={styles.modalSubtitle}>Pilih model lain jika server sedang sibuk (Error 503/429).</Text>
+            
+            {models.length === 0 ? (
+              <ActivityIndicator color="#4ECDC4" style={{marginVertical: 20}}/>
+            ) : (
+              <FlatList
+                data={models}
+                keyExtractor={(item) => item.name}
+                style={{maxHeight: 300}}
+                renderItem={({item}) => (
+                  <TouchableOpacity 
+                    style={[styles.modelOption, selectedModel === item.name && styles.modelOptionSelected]}
+                    onPress={() => selectModel(item.name)}
+                  >
+                    <Text style={[styles.modelOptionText, selectedModel === item.name && {color: '#4ECDC4', fontWeight: 'bold'}]}>
+                      {item.displayName}
+                    </Text>
+                    <Text style={styles.modelOptionSub}>{item.name}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            )}
+            
+            <TouchableOpacity style={styles.closeModalBtn} onPress={() => setShowModelPicker(false)}>
+              <Text style={styles.closeModalText}>Tutup</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
     </KeyboardAvoidingView>
   );
 }
@@ -129,6 +217,27 @@ const styles = StyleSheet.create({
     color: "#8F90A6",
     lineHeight: 22,
   },
+  modelSelector: {
+    backgroundColor: "#1A1A2E",
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(78, 205, 196, 0.3)',
+  },
+  modelSelectorLabel: {
+    fontSize: 12,
+    color: "#8F90A6",
+    marginBottom: 4,
+  },
+  modelSelectorValue: {
+    fontSize: 16,
+    color: "#FFFFFF",
+    fontWeight: "bold",
+  },
   inputContainer: {
     backgroundColor: "#1A1A2E",
     borderRadius: 20,
@@ -145,7 +254,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   button: {
-    backgroundColor: "#4ECDC4", // Mint green for create action
+    backgroundColor: "#4ECDC4",
     flexDirection: "row",
     padding: 18,
     borderRadius: 16,
@@ -176,5 +285,55 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 14,
     fontStyle: "italic",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#1A1A2E',
+    borderRadius: 20,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFF',
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: '#8F90A6',
+    marginBottom: 20,
+  },
+  modelOption: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  modelOptionSelected: {
+    backgroundColor: 'rgba(78, 205, 196, 0.1)',
+  },
+  modelOptionText: {
+    fontSize: 16,
+    color: '#FFF',
+  },
+  modelOptionSub: {
+    fontSize: 12,
+    color: '#8F90A6',
+    marginTop: 4,
+  },
+  closeModalBtn: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: '#2A2A3E',
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  closeModalText: {
+    color: '#FFF',
+    fontWeight: 'bold',
   }
 });
