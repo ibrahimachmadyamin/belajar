@@ -16,8 +16,10 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
 import {
   generateWithFallback,
+  extractTextFromImageWithFallback,
   getAvailableModels,
   getModelStatuses,
   pickBestModel,
@@ -40,6 +42,7 @@ const STATUS_BADGE: Record<ModelStatus, { label: string; color: string }> = {
 export default function CreateQuiz() {
   const [material, setMaterial] = useState("");
   const [loading, setLoading] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState(false);
   const [models, setModels] = useState<AIModel[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>("gemini-2.5-flash");
   const [showModelPicker, setShowModelPicker] = useState(false);
@@ -166,6 +169,117 @@ export default function CreateQuiz() {
     }
   };
 
+  const handlePickImage = async (fromCamera: boolean) => {
+    try {
+      if (fromCamera) {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert(
+            "Izin Kamera Diperlukan",
+            "Aplikasi membutuhkan izin kamera untuk memfoto catatan atau buku pelajaran."
+          );
+          return;
+        }
+      } else {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert(
+            "Izin Galeri Diperlukan",
+            "Aplikasi membutuhkan izin galeri untuk memilih foto materi."
+          );
+          return;
+        }
+      }
+
+      const result = fromCamera
+        ? await ImagePicker.launchCameraAsync({
+            base64: true,
+            quality: 0.8,
+            allowsEditing: false,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            base64: true,
+            quality: 0.8,
+            allowsEditing: false,
+          });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        return;
+      }
+
+      const asset = result.assets[0];
+      if (!asset.base64) {
+        Alert.alert("Gagal", "File gambar tidak dapat dibaca.");
+        return;
+      }
+
+      const mimeType = asset.mimeType || "image/jpeg";
+      setOcrLoading(true);
+      setActiveModel(selectedModel);
+
+      const { text, modelUsed, skipped } = await extractTextFromImageWithFallback(
+        asset.base64,
+        mimeType,
+        selectedModel,
+        models,
+        setActiveModel
+      );
+
+      if (!text || text.trim().length === 0) {
+        Alert.alert(
+          "Tidak Ada Teks Terbaca",
+          "AI tidak menemukan teks atau rumus pada gambar tersebut. Pastikan gambar cukup jelas dan tidak buram."
+        );
+        return;
+      }
+
+      if (material.trim().length > 0) {
+        Alert.alert(
+          "Teks Berhasil Dibaca! ✨",
+          "Teks dan rumus dari gambar telah diekstrak. Mau diapakan terhadap materi yang sudah ada di kotak?",
+          [
+            {
+              text: "Tambahkan di Bawah",
+              onPress: () => setMaterial((prev) => `${prev}\n\n${text}`),
+            },
+            {
+              text: "Ganti Semua",
+              onPress: () => setMaterial(text),
+            },
+            { text: "Batal", style: "cancel" },
+          ]
+        );
+      } else {
+        setMaterial(text);
+        Alert.alert(
+          "Teks Berhasil Dibaca! ✨",
+          "Teks dan rumus telah disalin ke kotak materi. Silakan periksa atau ubah jika diperlukan sebelum membuat soal kuis."
+        );
+      }
+
+      const firstSkip = skipped.find((s) => s.name === selectedModel);
+      if (modelUsed !== selectedModel && (firstSkip?.reason === "paid" || firstSkip?.reason === "unavailable")) {
+        setSelectedModel(modelUsed);
+        await AsyncStorage.setItem(MODEL_PREF_KEY, modelUsed);
+      }
+      setStatuses(await getModelStatuses());
+    } catch (error: any) {
+      console.error("Gagal membaca gambar:", error);
+      setStatuses(await getModelStatuses());
+      Alert.alert(
+        "Gagal Membaca Gambar",
+        friendlyErrorMessage(error),
+        [
+          { text: "Lihat detail", onPress: () => Alert.alert("Detail teknis", String(error?.message || error)) },
+          { text: "OK", style: "cancel" },
+        ]
+      );
+    } finally {
+      setOcrLoading(false);
+      setActiveModel(null);
+    }
+  };
+
   return (
     <KeyboardAvoidingView 
       style={styles.container} 
@@ -207,25 +321,57 @@ export default function CreateQuiz() {
           </View>
         )}
 
+        {/* Tombol Input Gambar / Foto */}
+        <View style={styles.imageActionBar}>
+          <TouchableOpacity 
+            style={[styles.imageBtn, (loading || ocrLoading) && styles.imageBtnDisabled]}
+            onPress={() => handlePickImage(true)}
+            disabled={loading || ocrLoading}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="camera" size={18} color="#4ECDC4" style={{marginRight: 6}} />
+            <Text style={styles.imageBtnText}>Foto Catatan</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.imageBtn, (loading || ocrLoading) && styles.imageBtnDisabled]}
+            onPress={() => handlePickImage(false)}
+            disabled={loading || ocrLoading}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="images" size={18} color="#4ECDC4" style={{marginRight: 6}} />
+            <Text style={styles.imageBtnText}>Pilih Gambar</Text>
+          </TouchableOpacity>
+        </View>
+
+        {ocrLoading && (
+          <View style={styles.ocrLoadingBox}>
+            <ActivityIndicator color="#4ECDC4" size="small" style={{marginRight: 8}} />
+            <Text style={styles.ocrLoadingText}>
+              {nameOf(activeModel || selectedModel)} sedang membaca teks & rumus...
+            </Text>
+          </View>
+        )}
+
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.textArea}
-            placeholder="Ketik atau paste materi pembelajaran di sini (minimal 10 karakter)..."
+            placeholder="Ketik, paste, atau foto materi pembelajaran di sini (minimal 10 karakter)..."
             placeholderTextColor="#5C5C70"
             multiline
             numberOfLines={10}
             textAlignVertical="top"
             value={material}
             onChangeText={setMaterial}
-            editable={!loading}
+            editable={!loading && !ocrLoading}
           />
         </View>
 
         <TouchableOpacity 
-          style={[styles.button, (!material || loading) && styles.buttonDisabled]} 
+          style={[styles.button, (!material || loading || ocrLoading) && styles.buttonDisabled]} 
           activeOpacity={0.8}
           onPress={handleGenerate}
-          disabled={!material || loading}
+          disabled={!material || loading || ocrLoading}
         >
           {loading ? (
             <ActivityIndicator color="#FFF" />
@@ -451,5 +597,46 @@ const styles = StyleSheet.create({
   closeModalText: {
     color: '#FFF',
     fontWeight: 'bold',
-  }
+  },
+  imageActionBar: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  imageBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(78, 205, 196, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(78, 205, 196, 0.3)',
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+  },
+  imageBtnDisabled: {
+    opacity: 0.5,
+  },
+  imageBtnText: {
+    color: '#4ECDC4',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  ocrLoadingBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1A1A2E',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(78, 205, 196, 0.3)',
+  },
+  ocrLoadingText: {
+    color: '#4ECDC4',
+    fontSize: 13,
+    fontWeight: '500',
+  },
 });

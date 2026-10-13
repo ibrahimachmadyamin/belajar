@@ -300,6 +300,10 @@ Jumlah soal yang dibuat harus disesuaikan dengan panjang dan detail materi:
 - Jika materinya sangat pendek (misal 1 kalimat), buatkan 1 atau 2 soal saja.
 - Jika materinya panjang (misal sebuah artikel), buatkan hingga maksimal 10 soal.
 
+Aturan Penting Format Rumus & Simbol:
+- Jika materi memuat matematika, fisika, kimia, atau sains, tuliskan rumus dan simbol di soal serta pilihan jawaban menggunakan karakter Unicode standar yang rapi (contoh: x², x³, √, ±, ≠, ≤, ≥, ½, ⅓, π, α, β, θ, Σ, ∫, →, ₀, ₁, ₂, H₂O, dll).
+- DILARANG menggunakan kode LaTeX mentah (seperti \\frac, \\sqrt, atau tanda $).
+
 Teks materi:
 """
 ${text}
@@ -339,5 +343,109 @@ ${text}
     }
   }
   
+  throw lastError;
+}
+
+export interface OcrResult {
+  text: string;
+  modelUsed: string;
+  skipped: SkippedModel[];
+}
+
+// Mengekstrak teks & rumus dari gambar menggunakan AI
+export async function extractTextFromImage(
+  base64Image: string,
+  mimeType: string = "image/jpeg",
+  modelName: string = "gemini-2.5-flash"
+): Promise<string> {
+  if (!apiKey || apiKey === "API_KEY_PLACEHOLDER") {
+    throw new Error("API Key Gemini belum dikonfigurasi.");
+  }
+
+  const model = genAI.getGenerativeModel(
+    { model: modelName },
+    { timeout: 120000 }
+  );
+
+  const prompt = `Ekstrak dan salin seluruh teks materi pembelajaran atau catatan dari gambar ini secara lengkap, teliti, dan terstruktur.
+
+Aturan Penting:
+1. Simbol & Rumus: Jika terdapat rumus matematika, fisika, kimia, atau simbol ilmiah, WAJIB ditulis menggunakan karakter Unicode standar yang rapi (contoh: x², x³, √, ±, ≠, ≤, ≥, ½, ⅓, π, α, β, θ, Σ, ∫, →, ₀, ₁, ₂, H₂O, dll).
+2. DILARANG menggunakan sintaks kode LaTeX mentah (seperti \\frac, \\sqrt, \\times, atau tanda $).
+3. Pertahankan susunan paragraf, judul, dan poin-poin materi agar mudah dibaca.
+4. Keluarkan HANYA teks materi hasil ekstraksi, tanpa kata pembuka/penutup basa-basi (seperti "Berikut adalah...", "Tentu,", dll).`;
+
+  let retries = 3;
+  let lastError = null;
+
+  while (retries > 0) {
+    try {
+      const result = await model.generateContent([
+        {
+          inlineData: {
+            data: base64Image,
+            mimeType: mimeType || "image/jpeg",
+          },
+        },
+        prompt,
+      ]);
+      const text = result.response.text();
+      return text.trim();
+    } catch (error: any) {
+      console.error(`Error OCR image (Retries left: ${retries - 1}):`, error);
+      lastError = error;
+      if (error.message && error.message.includes("503")) {
+        retries--;
+        if (retries > 0) {
+          console.log("Server sibuk. Mencoba lagi dalam 3 detik...");
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          continue;
+        }
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  throw lastError;
+}
+
+// Mengekstrak gambar dengan fallback otomatis antar-model jika ada model yang bermasalah/berbayar/kuota habis
+export async function extractTextFromImageWithFallback(
+  base64Image: string,
+  mimeType: string,
+  preferredModel: string,
+  candidates: AIModel[],
+  onAttempt?: (modelName: string) => void
+): Promise<OcrResult> {
+  const statuses = await getModelStatuses();
+  const order = [
+    preferredModel,
+    ...candidates
+      .map((m) => m.name)
+      .filter((n) => n !== preferredModel && statuses[n] !== "paid" && statuses[n] !== "unavailable" && statuses[n] !== "quota")
+      .sort((a, b) => (statuses[a] === "ok" ? 0 : 1) - (statuses[b] === "ok" ? 0 : 1)),
+  ].slice(0, 4);
+
+  const skipped: SkippedModel[] = [];
+  let lastError: any = null;
+
+  for (const modelName of order) {
+    onAttempt?.(modelName);
+    try {
+      const text = await extractTextFromImage(base64Image, mimeType, modelName);
+      await setModelStatus(modelName, "ok");
+      return { text, modelUsed: modelName, skipped };
+    } catch (error: any) {
+      lastError = error;
+      const kind = classifyError(error);
+      if (kind === "other") throw error;
+      if (kind !== "busy") await setModelStatus(modelName, kind);
+      const displayName = candidates.find((m) => m.name === modelName)?.displayName || modelName;
+      skipped.push({ name: modelName, displayName, reason: kind });
+    }
+  }
+
+  if (lastError) lastError.skipped = skipped;
   throw lastError;
 }

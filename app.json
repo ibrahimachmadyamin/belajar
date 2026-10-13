@@ -34,7 +34,14 @@
         }
       ],
       "expo-secure-store",
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Aplikasi membutuhkan izin untuk mengakses galeri untuk memuat gambar materi.",
+          "cameraPermission": "Aplikasi membutuhkan izin kamera untuk memfoto materi catatan atau buku."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
