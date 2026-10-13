@@ -85,6 +85,65 @@ function classifyError(error: any): ModelStatus | "busy" | "other" {
   return "other";
 }
 
+// Penjelasan singkat untuk tiap status (dipakai di tampilan)
+export const REASON_LABEL: Record<ModelStatus | "busy", string> = {
+  ok: "bisa dipakai",
+  paid: "berbayar",
+  quota: "jatah gratis hari ini habis",
+  unavailable: "sudah tidak tersedia",
+  busy: "server sedang penuh",
+};
+
+// Mengubah pesan error teknis dari Google menjadi kalimat sederhana untuk pengguna
+export function friendlyErrorMessage(error: any): string {
+  const raw = String(error?.message || "");
+  const msg = raw.toLowerCase();
+
+  // Semua model yang dicoba gagal -> tampilkan ringkasan per model
+  const skipped: SkippedModel[] | undefined = error?.skipped;
+  if (skipped && skipped.length > 1) {
+    const list = skipped.map((s) => `• ${s.displayName}: ${REASON_LABEL[s.reason]}`).join("\n");
+    const allQuota = skipped.every((s) => s.reason === "quota" || s.reason === "busy");
+    return `Sudah mencoba ${skipped.length} model AI, tapi semuanya sedang tidak bisa dipakai:\n\n${list}\n\n` +
+      (allQuota
+        ? "Ini biasanya hanya sementara. Coba lagi beberapa jam lagi atau besok."
+        : "Silakan coba lagi nanti atau pilih model lain secara manual.");
+  }
+
+  if (msg.includes("network request failed") || msg.includes("failed to fetch") || msg.includes("network error")) {
+    return "Tidak ada koneksi internet. Periksa sinyal atau Wi-Fi Anda, lalu coba lagi.";
+  }
+
+  // Status dari server Google (paling akurat, dicek lebih dulu)
+  switch (classifyError(error)) {
+    case "paid":
+      return "Model AI ini berbayar, jadi tidak bisa dipakai gratis. Silakan pilih model lain.";
+    case "quota":
+      return "Jatah gratis hari ini untuk model AI ini sudah habis. Pilih model lain, atau coba lagi besok.";
+    case "unavailable":
+      return "Model AI ini sudah tidak tersedia (dihapus oleh Google). Silakan pilih model lain.";
+    case "busy":
+      return "Server AI Google sedang penuh. Tunggu sebentar lalu coba lagi, atau pilih model lain.";
+  }
+  if (msg.includes("timeout") || msg.includes("timed out") || msg.includes("aborted")) {
+    return "AI terlalu lama menjawab. Coba lagi, atau persingkat materinya.";
+  }
+  if (msg.includes("api key not valid") || msg.includes("api_key_invalid") || msg.includes("belum dikonfigurasi")) {
+    return "Kunci akses (API Key) AI bermasalah atau sudah tidak berlaku. Perlu diperbarui di kode aplikasi.";
+  }
+  if (msg.includes("safety") || msg.includes("blocked")) {
+    return "Materi ditolak oleh filter keamanan AI. Coba ubah atau ganti sebagian isi materinya.";
+  }
+  if (error instanceof SyntaxError || msg.includes("json")) {
+    return "Jawaban dari AI tidak terbaca dengan benar. Silakan coba lagi.";
+  }
+  if (msg.includes("tidak mengembalikan soal")) {
+    return "AI tidak berhasil membuat soal dari materi ini. Coba tambahkan materi yang lebih lengkap.";
+  }
+
+  return "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.";
+}
+
 // Mengambil angka versi dari nama model, misal "gemini-2.5-flash" -> 2.5
 function getVersion(name: string): number {
   const match = name.match(/gemini-(\d+(?:\.\d+)?)/);
@@ -139,10 +198,16 @@ export function pickBestModel(models: AIModel[], statuses: Record<string, ModelS
   return verified?.name || usable[0]?.name || null;
 }
 
+export interface SkippedModel {
+  name: string;
+  displayName: string;
+  reason: ModelStatus | "busy";
+}
+
 export interface GenerateResult {
   questions: QuizQuestion[];
   modelUsed: string;
-  skipped: { name: string; reason: ModelStatus | "busy" }[];
+  skipped: SkippedModel[];
 }
 
 // Generate soal dengan model pilihan. Jika model tsb ternyata dihapus, berbayar,
@@ -177,10 +242,13 @@ export async function generateWithFallback(
       const kind = classifyError(error);
       if (kind === "other") throw error; // error lain (misal teks bermasalah), jangan ganti model
       if (kind !== "busy") await setModelStatus(modelName, kind);
-      skipped.push({ name: modelName, reason: kind });
+      const displayName = candidates.find((m) => m.name === modelName)?.displayName || modelName;
+      skipped.push({ name: modelName, displayName, reason: kind });
     }
   }
 
+  // Lampirkan daftar model yang gagal agar bisa dijelaskan ke pengguna
+  if (lastError) lastError.skipped = skipped;
   throw lastError;
 }
 

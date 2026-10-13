@@ -21,6 +21,8 @@ import {
   getAvailableModels,
   getModelStatuses,
   pickBestModel,
+  friendlyErrorMessage,
+  REASON_LABEL,
   AIModel,
   ModelStatus,
 } from "../services/ai";
@@ -29,17 +31,10 @@ import { saveQuestionsLocally } from "../services/storage";
 const MODEL_PREF_KEY = "@selected_ai_model";
 
 const STATUS_BADGE: Record<ModelStatus, { label: string; color: string }> = {
-  ok: { label: "✅ Gratis (terbukti)", color: "#4ECDC4" },
-  paid: { label: "💰 Berbayar / tanpa jatah gratis", color: "#FF8A65" },
-  quota: { label: "⏳ Kuota gratis hari ini habis", color: "#FFD166" },
-  unavailable: { label: "🚫 Tidak tersedia", color: "#FF6B6B" },
-};
-
-const REASON_TEXT: Record<string, string> = {
-  paid: "berbayar",
-  quota: "kuota habis",
-  unavailable: "sudah dihapus",
-  busy: "server sibuk",
+  ok: { label: "✅ Bisa dipakai gratis", color: "#4ECDC4" },
+  paid: { label: "💰 Berbayar, tidak bisa dipakai", color: "#FF8A65" },
+  quota: { label: "⏳ Jatah gratis hari ini habis", color: "#FFD166" },
+  unavailable: { label: "🚫 Sudah tidak tersedia", color: "#FF6B6B" },
 };
 
 export default function CreateQuiz() {
@@ -52,6 +47,9 @@ export default function CreateQuiz() {
   const [modelNotice, setModelNotice] = useState<string | null>(null);
   const [activeModel, setActiveModel] = useState<string | null>(null);
   const router = useRouter();
+
+  // Nama model yang mudah dibaca, misal "gemini-2.5-flash" -> "Gemini 2.5 Flash"
+  const nameOf = (id: string) => models.find((m) => m.name === id)?.displayName || id;
 
   useEffect(() => {
     loadModels();
@@ -86,8 +84,11 @@ export default function CreateQuiz() {
           if (best && best !== current) {
             setSelectedModel(best);
             await AsyncStorage.setItem(MODEL_PREF_KEY, best);
+            const bestName = availableModels.find((m) => m.name === best)?.displayName || best;
             setModelNotice(
-              `Model "${current}" ${!stillExists ? "sudah tidak tersedia di server Google" : "tidak bisa dipakai gratis"}, otomatis diganti ke "${best}".`
+              !stillExists
+                ? `Model AI yang Anda pakai sebelumnya sudah tidak ada lagi, jadi otomatis diganti ke ${bestName}.`
+                : `Model AI yang Anda pakai sebelumnya ternyata berbayar, jadi otomatis diganti ke ${bestName}.`
             );
           }
         }
@@ -128,11 +129,12 @@ export default function CreateQuiz() {
       const successCount = await saveQuestionsLocally(questions);
 
       // Jika model pilihan bermasalah permanen, jadikan model yang berhasil sebagai pilihan baru
-      const switchedInfo = skipped.length > 0
-        ? `\n\nCatatan: ${skipped.map((s) => `${s.name} (${REASON_TEXT[s.reason]})`).join(", ")} dilewati, soal dibuat dengan ${modelUsed}.`
+      const firstSkip = skipped.find((s) => s.name === selectedModel);
+      const switchedInfo = firstSkip
+        ? `\n\nCatatan: ${firstSkip.displayName} sedang tidak bisa dipakai (${REASON_LABEL[firstSkip.reason]}), jadi soal otomatis dibuat memakai ${nameOf(modelUsed)}.`
         : "";
       if (modelUsed !== selectedModel) {
-        const reason = skipped.find((s) => s.name === selectedModel)?.reason;
+        const reason = firstSkip?.reason;
         if (reason === "paid" || reason === "unavailable") {
           setSelectedModel(modelUsed);
           await AsyncStorage.setItem(MODEL_PREF_KEY, modelUsed);
@@ -141,15 +143,23 @@ export default function CreateQuiz() {
       setStatuses(await getModelStatuses());
 
       Alert.alert(
-        "Sukses!", 
-        `Berhasil membuat dan menyimpan ${successCount} soal kuis dari materi Anda.${switchedInfo}`,
+        "Berhasil! 🎉", 
+        `${successCount} soal baru sudah dibuat dan disimpan.${switchedInfo}`,
         [{ text: "OK", onPress: () => router.back() }]
       );
       
     } catch (error: any) {
       console.error(error);
       setStatuses(await getModelStatuses());
-      Alert.alert("Terjadi Kesalahan", error.message || "Gagal membuat soal. Pastikan pengaturan sudah benar.");
+      // Tampilkan penjelasan sederhana; detail teknis tetap bisa dilihat jika perlu
+      Alert.alert(
+        "Gagal Membuat Soal",
+        friendlyErrorMessage(error),
+        [
+          { text: "Lihat detail", onPress: () => Alert.alert("Detail teknis", String(error?.message || error)) },
+          { text: "OK", style: "cancel" },
+        ]
+      );
     } finally {
       setLoading(false);
       setActiveModel(null);
@@ -178,8 +188,13 @@ export default function CreateQuiz() {
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Ionicons name="hardware-chip-outline" size={20} color="#4ECDC4" style={{marginRight: 10}} />
             <View>
-              <Text style={styles.modelSelectorLabel}>Model AI (Ketuk untuk ubah)</Text>
-              <Text style={styles.modelSelectorValue}>{selectedModel}</Text>
+              <Text style={styles.modelSelectorLabel}>Model AI (ketuk untuk ganti)</Text>
+              <Text style={styles.modelSelectorValue}>{nameOf(selectedModel)}</Text>
+              {statuses[selectedModel] && statuses[selectedModel] !== "ok" && (
+                <Text style={[styles.modelBadge, { color: STATUS_BADGE[statuses[selectedModel]].color }]}>
+                  {STATUS_BADGE[statuses[selectedModel]].label}
+                </Text>
+              )}
             </View>
           </View>
           <Ionicons name="chevron-down" size={20} color="#8F90A6" />
@@ -224,7 +239,7 @@ export default function CreateQuiz() {
         
         {loading && (
           <Text style={styles.loadingText}>
-            AI ({activeModel || selectedModel}) sedang berpikir merangkai soal...
+            {nameOf(activeModel || selectedModel)} sedang membuat soal...
           </Text>
         )}
       </ScrollView>
@@ -234,7 +249,7 @@ export default function CreateQuiz() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Pilih Model AI</Text>
-            <Text style={styles.modalSubtitle}>Diurutkan dari model stabil & terbaru. Status gratis/berbayar diketahui otomatis setelah model dicoba.</Text>
+            <Text style={styles.modalSubtitle}>Model paling atas biasanya yang terbaru. Kalau satu model sedang penuh atau habis, aplikasi akan otomatis mencoba model lain.</Text>
             
             {models.length === 0 ? (
               <ActivityIndicator color="#4ECDC4" style={{marginVertical: 20}}/>
