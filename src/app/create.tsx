@@ -16,10 +16,31 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { generateQuestionsFromText, getAvailableModels, AIModel } from "../services/ai";
+import {
+  generateWithFallback,
+  getAvailableModels,
+  getModelStatuses,
+  pickBestModel,
+  AIModel,
+  ModelStatus,
+} from "../services/ai";
 import { saveQuestionsLocally } from "../services/storage";
 
 const MODEL_PREF_KEY = "@selected_ai_model";
+
+const STATUS_BADGE: Record<ModelStatus, { label: string; color: string }> = {
+  ok: { label: "✅ Gratis (terbukti)", color: "#4ECDC4" },
+  paid: { label: "💰 Berbayar / tanpa jatah gratis", color: "#FF8A65" },
+  quota: { label: "⏳ Kuota gratis hari ini habis", color: "#FFD166" },
+  unavailable: { label: "🚫 Tidak tersedia", color: "#FF6B6B" },
+};
+
+const REASON_TEXT: Record<string, string> = {
+  paid: "berbayar",
+  quota: "kuota habis",
+  unavailable: "sudah dihapus",
+  busy: "server sibuk",
+};
 
 export default function CreateQuiz() {
   const [material, setMaterial] = useState("");
@@ -27,6 +48,9 @@ export default function CreateQuiz() {
   const [models, setModels] = useState<AIModel[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>("gemini-2.5-flash");
   const [showModelPicker, setShowModelPicker] = useState(false);
+  const [statuses, setStatuses] = useState<Record<string, ModelStatus>>({});
+  const [modelNotice, setModelNotice] = useState<string | null>(null);
+  const [activeModel, setActiveModel] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -41,10 +65,32 @@ export default function CreateQuiz() {
         setSelectedModel(savedModel);
       }
       
-      // Fetch model dari API
-      const availableModels = await getAvailableModels();
+      // Fetch model dari API + status gratis/berbayar yang tersimpan
+      const [availableModels, savedStatuses] = await Promise.all([
+        getAvailableModels(),
+        getModelStatuses(),
+      ]);
+      setStatuses(savedStatuses);
+
       if (availableModels.length > 0) {
         setModels(availableModels);
+
+        // Validasi: apakah model tersimpan masih ada & masih bisa dipakai?
+        const current = savedModel || selectedModel;
+        const stillExists = availableModels.some((m) => m.name === current);
+        const s = savedStatuses[current];
+        const unusable = s === "paid" || s === "unavailable";
+
+        if (!stillExists || unusable) {
+          const best = pickBestModel(availableModels, savedStatuses);
+          if (best && best !== current) {
+            setSelectedModel(best);
+            await AsyncStorage.setItem(MODEL_PREF_KEY, best);
+            setModelNotice(
+              `Model "${current}" ${!stillExists ? "sudah tidak tersedia di server Google" : "tidak bisa dipakai gratis"}, otomatis diganti ke "${best}".`
+            );
+          }
+        }
       }
     } catch (e) {
       console.warn("Gagal memuat daftar model");
@@ -54,6 +100,7 @@ export default function CreateQuiz() {
   const selectModel = async (modelName: string) => {
     setSelectedModel(modelName);
     setShowModelPicker(false);
+    setModelNotice(null);
     await AsyncStorage.setItem(MODEL_PREF_KEY, modelName);
   };
 
@@ -65,8 +112,13 @@ export default function CreateQuiz() {
 
     setLoading(true);
     try {
-      // 1. Generate dari AI dengan model pilihan
-      const questions = await generateQuestionsFromText(material, selectedModel);
+      // 1. Generate dari AI dengan model pilihan (otomatis pindah model jika gagal)
+      const { questions, modelUsed, skipped } = await generateWithFallback(
+        material,
+        selectedModel,
+        models,
+        setActiveModel
+      );
       
       if (!questions || questions.length === 0) {
         throw new Error("AI tidak mengembalikan soal.");
@@ -75,17 +127,32 @@ export default function CreateQuiz() {
       // 2. Simpan ke Local Storage (AsyncStorage/SAF)
       const successCount = await saveQuestionsLocally(questions);
 
+      // Jika model pilihan bermasalah permanen, jadikan model yang berhasil sebagai pilihan baru
+      const switchedInfo = skipped.length > 0
+        ? `\n\nCatatan: ${skipped.map((s) => `${s.name} (${REASON_TEXT[s.reason]})`).join(", ")} dilewati, soal dibuat dengan ${modelUsed}.`
+        : "";
+      if (modelUsed !== selectedModel) {
+        const reason = skipped.find((s) => s.name === selectedModel)?.reason;
+        if (reason === "paid" || reason === "unavailable") {
+          setSelectedModel(modelUsed);
+          await AsyncStorage.setItem(MODEL_PREF_KEY, modelUsed);
+        }
+      }
+      setStatuses(await getModelStatuses());
+
       Alert.alert(
         "Sukses!", 
-        `Berhasil membuat dan menyimpan ${successCount} soal kuis dari materi Anda.`,
+        `Berhasil membuat dan menyimpan ${successCount} soal kuis dari materi Anda.${switchedInfo}`,
         [{ text: "OK", onPress: () => router.back() }]
       );
       
     } catch (error: any) {
       console.error(error);
+      setStatuses(await getModelStatuses());
       Alert.alert("Terjadi Kesalahan", error.message || "Gagal membuat soal. Pastikan pengaturan sudah benar.");
     } finally {
       setLoading(false);
+      setActiveModel(null);
     }
   };
 
@@ -117,6 +184,13 @@ export default function CreateQuiz() {
           </View>
           <Ionicons name="chevron-down" size={20} color="#8F90A6" />
         </TouchableOpacity>
+
+        {modelNotice && (
+          <View style={styles.noticeBox}>
+            <Ionicons name="information-circle-outline" size={18} color="#FFD166" style={{marginRight: 8}} />
+            <Text style={styles.noticeText}>{modelNotice}</Text>
+          </View>
+        )}
 
         <View style={styles.inputContainer}>
           <TextInput
@@ -150,7 +224,7 @@ export default function CreateQuiz() {
         
         {loading && (
           <Text style={styles.loadingText}>
-            AI ({selectedModel}) sedang berpikir merangkai soal...
+            AI ({activeModel || selectedModel}) sedang berpikir merangkai soal...
           </Text>
         )}
       </ScrollView>
@@ -160,7 +234,7 @@ export default function CreateQuiz() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Pilih Model AI</Text>
-            <Text style={styles.modalSubtitle}>Pilih model lain jika server sedang sibuk (Error 503/429).</Text>
+            <Text style={styles.modalSubtitle}>Diurutkan dari model stabil & terbaru. Status gratis/berbayar diketahui otomatis setelah model dicoba.</Text>
             
             {models.length === 0 ? (
               <ActivityIndicator color="#4ECDC4" style={{marginVertical: 20}}/>
@@ -169,7 +243,9 @@ export default function CreateQuiz() {
                 data={models}
                 keyExtractor={(item) => item.name}
                 style={{maxHeight: 300}}
-                renderItem={({item}) => (
+                renderItem={({item}) => {
+                  const badge = statuses[item.name] ? STATUS_BADGE[statuses[item.name]] : null;
+                  return (
                   <TouchableOpacity 
                     style={[styles.modelOption, selectedModel === item.name && styles.modelOptionSelected]}
                     onPress={() => selectModel(item.name)}
@@ -178,8 +254,12 @@ export default function CreateQuiz() {
                       {item.displayName}
                     </Text>
                     <Text style={styles.modelOptionSub}>{item.name}</Text>
+                    <Text style={[styles.modelBadge, { color: badge?.color || '#5C5C70' }]}>
+                      {badge?.label || "❔ Belum dicoba"}
+                    </Text>
                   </TouchableOpacity>
-                )}
+                  );
+                }}
               />
             )}
             
@@ -324,6 +404,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#8F90A6',
     marginTop: 4,
+  },
+  modelBadge: {
+    fontSize: 12,
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  noticeBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: 'rgba(255, 209, 102, 0.1)',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 209, 102, 0.3)',
+  },
+  noticeText: {
+    flex: 1,
+    color: '#FFD166',
+    fontSize: 13,
+    lineHeight: 19,
   },
   closeModalBtn: {
     marginTop: 20,
