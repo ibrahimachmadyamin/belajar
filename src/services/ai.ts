@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { cleanMathText, cleanOcrText } from "./mathText";
 
 // Menyimpan API Key dengan string dipecah untuk menghindari blokir dari GitHub Push Protection
 const apiKey = "AQ.Ab8RN6IRRP7hSF-" + "pbVYNsruLKXYavNueNVyI7y7Yf3deEn6vYw";
@@ -303,6 +304,7 @@ Jumlah soal yang dibuat harus disesuaikan dengan panjang dan detail materi:
 Aturan Penting Format Rumus & Simbol:
 - Jika materi memuat matematika, fisika, kimia, atau sains, tuliskan rumus dan simbol di soal serta pilihan jawaban menggunakan karakter Unicode standar yang rapi (contoh: x², x³, √, ±, ≠, ≤, ≥, ½, ⅓, π, α, β, θ, Σ, ∫, →, ₀, ₁, ₂, H₂O, dll).
 - DILARANG menggunakan kode LaTeX mentah (seperti \\frac, \\sqrt, atau tanda $).
+- DILARANG memakai format markdown seperti tanda bintang (*teks* atau **teks**) atau tanda pagar (#). Tulis sebagai teks biasa.
 
 Teks materi:
 """
@@ -321,8 +323,13 @@ ${text}
       // Membersihkan teks dari markdown (misalnya ```json ... ```) agar aman di-parse
       responseText = responseText.replace(/^```json\n?/gm, '').replace(/^```\n?/gm, '').trim();
       
-      // Parsing JSON hasil dari AI
-      const questions: QuizQuestion[] = JSON.parse(responseText);
+      // Parsing JSON hasil dari AI, lalu rapikan rumus & hapus sisa markdown/LaTeX
+      const questions: QuizQuestion[] = JSON.parse(responseText).map((q: QuizQuestion) => ({
+        ...q,
+        question: cleanMathText(q.question),
+        options: (q.options || []).map((o) => cleanMathText(o)),
+        explanation: cleanMathText(q.explanation),
+      }));
       return questions;
     } catch (error: any) {
       console.error(`Error generating questions (Retries left: ${retries - 1}):`, error);
@@ -372,8 +379,10 @@ export async function extractTextFromImage(
 Aturan Penting:
 1. Simbol & Rumus: Jika terdapat rumus matematika, fisika, kimia, atau simbol ilmiah, WAJIB ditulis menggunakan karakter Unicode standar yang rapi (contoh: x², x³, √, ±, ≠, ≤, ≥, ½, ⅓, π, α, β, θ, Σ, ∫, →, ₀, ₁, ₂, H₂O, dll).
 2. DILARANG menggunakan sintaks kode LaTeX mentah (seperti \\frac, \\sqrt, \\times, atau tanda $).
-3. Pertahankan susunan paragraf, judul, dan poin-poin materi agar mudah dibaca.
-4. Keluarkan HANYA teks materi hasil ekstraksi, tanpa kata pembuka/penutup basa-basi (seperti "Berikut adalah...", "Tentu,", dll).`;
+3. Tulis setiap rumus HANYA SATU KALI. Jangan menulis versi LaTeX dan versi Unicode sekaligus.
+4. DILARANG memakai format markdown: jangan pakai tanda bintang (*teks* atau **teks**) maupun tanda pagar (#). Untuk daftar poin, gunakan tanda "•".
+5. Pertahankan susunan paragraf, judul, dan poin-poin materi agar mudah dibaca.
+6. Keluarkan HANYA teks materi hasil ekstraksi, tanpa kata pembuka/penutup basa-basi (seperti "Berikut adalah...", "Tentu,", dll).`;
 
   let retries = 3;
   let lastError = null;
@@ -390,7 +399,7 @@ Aturan Penting:
         prompt,
       ]);
       const text = result.response.text();
-      return text.trim();
+      return cleanOcrText(text);
     } catch (error: any) {
       console.error(`Error OCR image (Retries left: ${retries - 1}):`, error);
       lastError = error;
